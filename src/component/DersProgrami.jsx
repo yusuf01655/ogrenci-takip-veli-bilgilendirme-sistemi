@@ -2,6 +2,7 @@ import { Container, Table, TableBody, TableCell, TableContainer, TableHead, Tabl
 import React from "react";
 import './style/DersProgrami.css';
 import "bootstrap/dist/css/bootstrap.min.css";
+import { FaCalendarAlt } from "react-icons/fa";
 
 const scheduleData = [
   { day: "Pazartesi", subject: "Matematik", time: "09:00 - 10:30" },
@@ -18,11 +19,13 @@ const scheduleData = [
 
 const DersProgrami = () => {
 
-    return(<><div className="container mt-4">
-      <h2 className="text-center mb-4">Öğrenci Ders Programı</h2>
+    return(<> <div className="container mt-4">
+      <h2 className="text-center mb-4 title">
+        <FaCalendarAlt className="icon" /> Öğrenci Ders Programı
+      </h2>
       <div className="table-responsive">
-        <table className="table table-striped table-bordered">
-          <thead className="thead-dark">
+        <table className="table table-striped table-bordered custom-table">
+          <thead>
             <tr>
               <th>Gün</th>
               <th>Ders</th>

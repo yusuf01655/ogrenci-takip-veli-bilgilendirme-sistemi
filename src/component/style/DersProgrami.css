@@ -1,0 +1,57 @@
+body {
+  font-family: "Roboto", sans-serif;
+  background-color: #f8f9fa;
+}
+
+.title {
+  color: #007bff;
+  font-weight: bold;
+}
+
+.icon {
+  margin-right: 10px;
+  color: #28a745;
+}
+
+.custom-table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.custom-table thead {
+  background-color: #007bff;
+  color: white;
+}
+
+.custom-table tbody tr:hover {
+  background-color: #ffa50033;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.custom-table td, .custom-table th {
+  text-align: center;
+  padding: 12px;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.modal {
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
