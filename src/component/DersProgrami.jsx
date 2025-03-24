@@ -1,4 +1,4 @@
-import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from "@mui/material";
+
 import React from "react";
 import './style/DersProgrami.css';
 import "bootstrap/dist/css/bootstrap.min.css";
