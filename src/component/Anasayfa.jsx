@@ -66,7 +66,7 @@ class Anasayfa extends React.Component {
             </Col>
 
             {/* Orta Bölüm (Ana İçerik Alanı) */}
-            <Col md={6} className="content">
+            <Col md={5} className="content">
               <h2>Hoşgeldiniz, [Öğrenci Adı]!</h2>
               <Card className="mb-3 quick-summary">
                 <Card.Body>
