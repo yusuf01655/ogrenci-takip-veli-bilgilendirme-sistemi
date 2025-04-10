@@ -1,0 +1,131 @@
+/* Genel Stil Ayarları */
+body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif; /* Material UI temasıyla aynı font */
+    background-color: #F8F9FA; /* Açık Gri Arka Plan */
+  }
+  
+  /* Sol Menü Stilleri */
+  .drawer-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .menu-item.Mui-selected {
+    background-color: rgba(0, 123, 255, 0.1) !important; /* Seçili öğe arka planı */
+    border-right: 3px solid #007BFF; /* Seçili öğe için mavi kenarlık */
+    color: #007BFF; /* Seçili öğe metin rengi */
+  }
+  
+  .menu-item.Mui-selected .MuiListItemIcon-root {
+      color: #007BFF; /* Seçili ikon rengi */
+  }
+  
+  .menu-item .MuiListItemIcon-root {
+    min-width: 40px; /* İkonlar için minimum genişlik */
+  }
+  
+  /* Üst Bar (AppBar) Geçiş Efekti */
+  .app-bar-transition {
+      transition: box-shadow 0.3s ease-in-out;
+  }
+  
+  /* İkon Buton Hover Efekti */
+  .icon-button-hover:hover {
+      background-color: rgba(0, 0, 0, 0.04); /* Hafif gri arka plan */
+      transition: background-color 0.2s ease;
+  }
+  
+  /* Ana İçerik Alanı Stilleri */
+  .main-content {
+    padding: 24px; /* İçerik etrafında ferah boşluk */
+  }
+  
+  /* Genel Bakış İstatistik Kartları */
+  .stat-card {
+    padding: 20px;
+    text-align: center;
+    color: white; /* Genel metin rengi beyaz */
+    border-radius: 12px; /* Yuvarlak köşeler */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Hover efekti için geçiş */
+    cursor: pointer; /* Tıklanabilir hissi */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 150px; /* Minimum yükseklik */
+  }
+  
+  .stat-card:hover {
+      transform: translateY(-5px); /* Hafif yukarı kalkma efekti */
+      box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1); /* Daha belirgin gölge */
+  }
+  
+  .stat-card .MuiSvgIcon-root { /* İkon boyutu ve alt boşluk */
+      font-size: 2.5rem;
+      margin-bottom: 8px;
+  }
+  
+  .stat-card h6 { /* Sayı font kalınlığı */
+      font-weight: 600;
+      margin-bottom: 4px;
+  }
+  
+  /* Farklı Renklerde İstatistik Kartları */
+  .stat-card-blue { background: linear-gradient(135deg, #007BFF, #0056b3); } /* Mavi */
+  .stat-card-green { background: linear-gradient(135deg, #28A745, #1c7430); } /* Yeşil */
+  .stat-card-orange { background: linear-gradient(135deg, #FFA500, #cc8400); } /* Turuncu */
+  .stat-card-purple { background: linear-gradient(135deg, #6f42c1, #5a349a); } /* Mor (Örnek ek renk) */
+  
+  
+  /* İçerik Geçiş Animasyonu */
+  .content-transition {
+    animation: fadeIn 0.5s ease-out; /* Hafif fade-in animasyonu */
+  }
+  
+  /* Fade-in Animasyon Keyframes */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px); /* Hafif aşağıdan gelme efekti */
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* CSS'te fade-in sınıfı (Menü, Modallar vb. için kullanılabilir) */
+  .fade-in {
+      animation: fadeIn 0.4s ease-in-out;
+  }
+  
+  
+  /* Mobil Cihazlar İçin Ekstra Ayarlamalar (Örnek) */
+  @media (max-width: 600px) {
+    .main-content {
+      padding: 16px; /* Mobilde daha az boşluk */
+    }
+  
+    .stat-card {
+      min-height: 120px; /* Mobilde kart yüksekliği biraz daha az */
+      padding: 15px;
+    }
+  
+     .stat-card .MuiSvgIcon-root {
+      font-size: 2rem; /* Mobilde ikonlar biraz daha küçük */
+    }
+  
+    .stat-card h6 {
+      font-size: 1.1rem; /* Mobilde sayı fontu biraz daha küçük */
+    }
+  }
+  
+  /* Tablet Görünümü İçin Ayarlamalar (Örnek) */
+  @media (min-width: 601px) and (max-width: 960px) {
+      .stat-card {
+          min-height: 140px;
+      }
+  }
+  

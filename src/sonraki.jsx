@@ -159,17 +159,116 @@ const theme = createTheme({
   },
 });
 function App() {
+    // Kullanıcının giriş yapıp yapmadığını ve tipini tutacak state'ler
+  // Gerçek uygulamada bu bilgiyi localStorage, context API veya state management kütüphanesi (Redux, Zustand) ile yönetmek daha iyidir.
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userType, setUserType] = useState('ogrenci'); // 'ogrenci', 'veli', 'yonetim'
+
+  // Giriş işlemi (GirisEkrani'ndan çağrılacak)
+  const handleLogin = (type) => {
+    setIsLoggedIn(true);
+    setUserType(type);
+    // Gerçek uygulamada burada API çağrısı, token kaydetme vb. işlemler yapılır.
+    console.log(type + ' olarak giriş yapıldı.');
+  };
+
+  // Çıkış işlemi (Bir 'Çıkış Yap' butonu ile çağrılabilir)
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setUserType(null);
+    // Token silme vb. işlemler
+    console.log('Çıkış yapıldı.');
+  };
+
+  // --- Yönlendirme Mantığı ---
+  // Giriş yapılmamışsa her zaman giriş ekranına yönlendir
+  if (!isLoggedIn) {
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+         {/* BrowserRouter'ı burada da kullanabilirsiniz veya sadece giriş ekranını gösterebilirsiniz */}
+         <BrowserRouter>
+            <Routes>
+              <Route path="*" element={<GirisEkrani onLogin={handleLogin} />} />
+              {/* Eğer giriş ekranı dışında başka public sayfalar varsa buraya ekleyebilirsiniz */}
+              {/* <Route path="/hakkimizda" element={<Hakkimizda />} /> */}
+            </Routes>
+         </BrowserRouter>
+      </ThemeProvider>
+    );
+  }
+
+  // --- Giriş Yapılmışsa Kullanıcı Tipine Göre Yönlendirme ---
+  // Kullanıcı tipine göre hangi anasayfanın gösterileceğini belirle
+  let HomePageComponent;
+  switch (userType) {
+    case 'veli':
+      HomePageComponent = VeliAnasayfa;
+      break;
+    case 'yonetim':
+      HomePageComponent = YonetimAnasayfa;
+      break;
+    case 'ogrenci':
+    default: // Varsayılan olarak öğrenci anasayfası
+      HomePageComponent = Anasayfa;
+      break;
+  }
+
+
   return (
     <div className='App'>
     asdas
     <ThemeProvider theme={theme}>
     <CssBaseline /> {/* Apply baseline styles and background color */}
-    
-     <Anasayfa/>
+    {/* BrowserRouter yönlendirmeyi etkinleştirir */}
+    <BrowserRouter>
+        {/* Üst kısımda sabit kalacak bir menü veya başlık eklenebilir */}
+        <header style={{ background: '#eee', padding: '10px', marginBottom: '10px' }}>
+          <nav>
+            {/* Link bileşenleri ile sayfa geçişleri (örnek) */}
+            {/* Bu linkler kullanıcı tipine göre dinamik olarak gösterilebilir */}
+            {userType === 'ogrenci' && <a href="/">Anasayfa</a>} | {' '}
+            {userType === 'ogrenci' && <a href="/ders-programi">Ders Programı</a>}
+            {userType === 'veli' && <a href="/">Veli Anasayfa</a>}
+            {userType === 'yonetim' && <a href="/">Yönetim Anasayfa</a>}
+             | <button onClick={handleLogout}>Çıkış Yap</button>
+             {/* Not: Gerçek uygulamada <Link to="/">Anasayfa</Link> gibi react-router-dom'un Link bileşenini kullanın */}
+          </nav>
+        </header>
+
+        {/* Routes, URL'ye göre hangi Route'un aktif olacağını belirler */}
+        <Routes>
+          {/* Ana Sayfa Yönlendirmesi (Kullanıcı tipine göre değişir) */}
+          <Route path="/" element={<HomePageComponent userType={userType} />} />
+
+          {/* Diğer Sayfalar (Örnek: Sadece öğrenci görebilsin) */}
+          {userType === 'ogrenci' && (
+            <Route path="/ders-programi" element={<DersProgrami userType={userType} />} />
+          )}
+
+          {/* Yetkisiz Erişim veya Tanımsız Rotalar için Yönlendirme */}
+          {/* Örneğin, veli ders programına girmeye çalışırsa anasayfaya yönlendir */}
+          {userType !== 'ogrenci' && (
+             <Route path="/ders-programi" element={<Navigate to="/" replace />} />
+          )}
+
+          {/* Diğer kullanıcı tipleri için özel sayfalar buraya eklenebilir */}
+          {/* <Route path="/veli/bildirimler" element={userType === 'veli' ? <VeliBildirimler /> : <Navigate to="/" />} /> */}
+          {/* <Route path="/yonetim/kullanicilar" element={userType === 'yonetim' ? <YonetimKullanicilar /> : <Navigate to="/" />} /> */}
+
+
+          {/* Eşleşmeyen tüm yollar için ana sayfaya yönlendirme veya 404 sayfası */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+          {/* Veya bir 404 Not Found bileşeni gösterebilirsiniz: */}
+          {/* <Route path="*" element={<NotFoundPage />} /> */}
+
+        </Routes>
+      </BrowserRouter>
+   {/*  <Anasayfa/>
     <DersProgrami/>
     <VeliAnasayfa/>
     <GirisEkrani />
-    <YonetimAnasayfa/> 
+    <YonetimAnasayfa/> */}
     </ThemeProvider>
     </div>);
 }
