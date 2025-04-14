@@ -222,7 +222,7 @@ function App() {
     <CssBaseline /> {/* Apply baseline styles and background color */}
     {/* BrowserRouter yönlendirmeyi etkinleştirir */}
     <BrowserRouter>
-        {/* Üst kısımda sabit kalacak bir menü veya başlık eklenebilir */}
+        {/* Üst kısımda sabit kalacak bir menü veya başlık ekleyiniz. */}
         <header style={{ background: '#eee', padding: '10px', marginBottom: '10px' }}>
           <nav>
             {/* Link bileşenleri ile sayfa geçişleri (örnek) */}
@@ -232,11 +232,11 @@ function App() {
             {userType === 'veli' && <a href="/">Veli Anasayfa</a>}
             {userType === 'yonetim' && <a href="/">Yönetim Anasayfa</a>}
              | <button onClick={handleLogout}>Çıkış Yap</button>
-             {/* Not: Gerçek uygulamada <Link to="/">Anasayfa</Link> gibi react-router-dom'un Link bileşenini kullanın */}
+             {/* talep:  <Link to="/">Anasayfa</Link> gibi react-router-dom'un Link bileşenini kullanacak şekilde güncelleyiniz*/}
           </nav>
         </header>
 
-        {/* Routes, URL'ye göre hangi Route'un aktif olacağını belirler */}
+        
         <Routes>
           {/* Ana Sayfa Yönlendirmesi (Kullanıcı tipine göre değişir) */}
           <Route path="/" element={<HomePageComponent userType={userType} />} />
@@ -246,13 +246,13 @@ function App() {
             <Route path="/ders-programi" element={<DersProgrami userType={userType} />} />
           )}
 
-          {/* Yetkisiz Erişim veya Tanımsız Rotalar için Yönlendirme */}
+          {/* Yetkisiz Erişim veya Tanımsız Rotalar için Yönlendirme yapınız */}
           {/* Örneğin, veli ders programına girmeye çalışırsa anasayfaya yönlendir */}
           {userType !== 'ogrenci' && (
              <Route path="/ders-programi" element={<Navigate to="/" replace />} />
           )}
 
-          {/* Diğer kullanıcı tipleri için özel sayfalar buraya eklenebilir */}
+          {/* Diğer kullanıcı tipleri için özel sayfaları  buraya ekleyiniz */}
           {/* <Route path="/veli/bildirimler" element={userType === 'veli' ? <VeliBildirimler /> : <Navigate to="/" />} /> */}
           {/* <Route path="/yonetim/kullanicilar" element={userType === 'yonetim' ? <YonetimKullanicilar /> : <Navigate to="/" />} /> */}
 

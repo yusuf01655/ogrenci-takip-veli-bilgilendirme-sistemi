@@ -1,3 +1,4 @@
+/*Anasayfa.jsx */
 import React from 'react';
 import { Navbar, Container, Row, Col, Card, Button, Modal } from 'react-bootstrap';
 import './style/Anasayfa.css';
@@ -19,7 +20,7 @@ class Anasayfa extends React.Component {
   }
 
   render() {
-    return (
+    return (<>
       <div className="page-transition">
         {/* Üst Menü (Navbar) */}
         <Navbar expand="lg" variant="dark" className="navbar">
@@ -120,7 +121,7 @@ class Anasayfa extends React.Component {
           </Modal.Footer>
         </Modal>
       </div>
-    );
+      </>);
   }
 }
 
