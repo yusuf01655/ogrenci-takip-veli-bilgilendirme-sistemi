@@ -1,6 +1,21 @@
-/*Anasayfa.jsx */
+// Anasayfa.jsx (Material UI versiyonu)
+
 import React from 'react';
-import { Navbar, Container, Row, Col, Card, Button, Modal } from 'react-bootstrap';
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Container,
+  Grid,
+  Card,
+  CardContent,
+  CardHeader,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
+} from '@mui/material';
 import './style/Anasayfa.css';
 
 class Anasayfa extends React.Component {
@@ -10,6 +25,14 @@ class Anasayfa extends React.Component {
       showModal: false
     };
   }
+  componentDidMount() {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      alert('Lütfen giriş yapınız.');
+      window.location.href = '/login';
+    }
+    console.log("Anasayfa yüklendi.");
+  }
 
   handleModalShow = () => {
     this.setState({ showModal: true });
@@ -18,110 +41,126 @@ class Anasayfa extends React.Component {
   handleModalClose = () => {
     this.setState({ showModal: false });
   }
+  handleLogout = () => {
+    // JWT'yi temizle
+    localStorage.removeItem('authToken'); // ya da sessionStorage
+  
+    // Giriş sayfasına yönlendir
+    window.location.href = '/login';
+
+    
+  }
+  
 
   render() {
-    return (<>
+    return (
       <div className="page-transition">
         {/* Üst Menü (Navbar) */}
-        <Navbar expand="lg" variant="dark" className="navbar">
-          <Container>
-            <Navbar.Brand>Öğrenci Takip ve Veli Bilgilendirme Sistemi</Navbar.Brand>
-          </Container>
-        </Navbar>
+        <AppBar position="static" className="navbar">
+          <Toolbar>
+            <Typography variant="h6">
+              Öğrenci Takip ve Veli Bilgilendirme Sistemi
+            </Typography>
+            <Button variant="contained" color="secondary" onClick={this.handleLogout}>
+  Çıkış Yap
+</Button>
+
+          </Toolbar>
+        </AppBar>
 
         {/* Ana İçerik */}
         <Container className="mt-4">
-          <Row>
-            {/* Sol Panel (Yan Menü) */}
-            <Col md={3} className="sidebar">
+          <Grid container spacing={2}>
+            {/* Sol Panel */}
+            <Grid item xs={12} md={3} className="sidebar">
               <Card className="mb-3">
-                <Card.Body>
-                  <Card.Title>Profil</Card.Title>
-                  <Card.Text>Öğrenci Adı</Card.Text>
-                </Card.Body>
+                <CardContent>
+                  <Typography variant="h6">Profil</Typography>
+                  <Typography>Öğrenci Adı</Typography>
+                </CardContent>
               </Card>
               <Card className="mb-3">
-                <Card.Body>
-                  <Card.Title>Ders Listesi</Card.Title>
-                  <Card.Text>Matematik, Fizik, Kimya...</Card.Text>
-                </Card.Body>
+                <CardContent>
+                  <Typography variant="h6">Ders Listesi</Typography>
+                  <Typography>Matematik, Fizik, Kimya...</Typography>
+                </CardContent>
               </Card>
               <Card className="mb-3">
-                <Card.Body>
-                  <Card.Title>Devamsızlık Bilgileri</Card.Title>
-                 
-                </Card.Body>
+                <CardContent>
+                  <Typography variant="h6">Devamsızlık Bilgileri</Typography>
+                </CardContent>
               </Card>
               <Card className="mb-3">
-                <Card.Body>
-                  <Card.Title>Disiplin Kayıtları</Card.Title>
-                  <Card.Text>Matematik, Fizik, Kimya...</Card.Text>
-                </Card.Body>
+                <CardContent>
+                  <Typography variant="h6">Disiplin Kayıtları</Typography>
+                  <Typography>Matematik, Fizik, Kimya...</Typography>
+                </CardContent>
               </Card>
               <Card className="mb-3">
-                <Card.Body>
-                  <Card.Title>Sosyal Etkinlikler</Card.Title>
-                  <Card.Text>Matematik, Fizik, Kimya...</Card.Text>
-                </Card.Body>
+                <CardContent>
+                  <Typography variant="h6">Sosyal Etkinlikler</Typography>
+                  <Typography>Matematik, Fizik, Kimya...</Typography>
+                </CardContent>
               </Card>
-            </Col>
+            </Grid>
 
-            {/* Orta Bölüm (Ana İçerik Alanı) */}
-            <Col md={5} className="content">
-              <h2>Hoşgeldiniz, [Öğrenci Adı]!</h2>
+            {/* Orta Bölüm */}
+            <Grid item xs={12} md={6} className="content">
+              <Typography variant="h4" gutterBottom>
+                Hoşgeldiniz, [Öğrenci Adı]!
+              </Typography>
+
               <Card className="mb-3 quick-summary">
-                <Card.Body>
-                  <p>Devamsızlık: %5</p>
-                  <p>Yaklaşan Sınav: Matematik - 12 Mayıs</p>
-                 
-                </Card.Body>
+                <CardContent>
+                  <Typography>Devamsızlık: %5</Typography>
+                  <Typography>Yaklaşan Sınav: Matematik - 12 Mayıs</Typography>
+                </CardContent>
               </Card>
-              <Card className="mb-3">
-                <Card.Header>Ders Programı</Card.Header>
-              </Card>
-              <Card className="mb-3">
-                <Card.Header>Sınav Tarihleri</Card.Header>
-              </Card>
-              <Card className="mb-3">
-                <Card.Header>Davranış Notları</Card.Header>
-              </Card>
-              <Card className="mb-3">
-                <Card.Header>Performans Değerlendirmeleri</Card.Header>
-              </Card>
-            </Col>
-            
 
-            {/* Sağ Panel (Öne Çıkan Bilgiler / Bildirimler) */}
-            <Col md={3} className="right-panel">
               <Card className="mb-3">
-                <Card.Header>Duyurular</Card.Header>
-                <Card.Body>
-                  <p>Acil duyuru: Sınav takvimi güncellendi.</p>
-                </Card.Body>
+                <CardHeader title="Ders Programı" />
               </Card>
-              <Button variant="primary" onClick={this.handleModalShow}>
+              <Card className="mb-3">
+                <CardHeader title="Sınav Tarihleri" />
+              </Card>
+              <Card className="mb-3">
+                <CardHeader title="Davranış Notları" />
+              </Card>
+              <Card className="mb-3">
+                <CardHeader title="Performans Değerlendirmeleri" />
+              </Card>
+            </Grid>
+
+            {/* Sağ Panel */}
+            <Grid item xs={12} md={3} className="right-panel">
+              <Card className="mb-3">
+                <CardHeader title="Duyurular" />
+                <CardContent>
+                  <Typography>Acil duyuru: Sınav takvimi güncellendi.</Typography>
+                </CardContent>
+              </Card>
+
+              <Button variant="contained" color="primary" onClick={this.handleModalShow}>
                 Mesaj Göster
               </Button>
-            </Col>
-          </Row>
+            </Grid>
+          </Grid>
         </Container>
 
-        {/* Modal: Öğretmen Mesajı */}
-        <Modal show={this.state.showModal} onHide={this.handleModalClose} animation={true} className="fade">
-          <Modal.Header closeButton>
-            <Modal.Title>Öğretmen Mesajı</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <p>Öğrenciye özel mesaj içeriği burada yer alır.</p>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={this.handleModalClose}>
+        {/* Modal (MUI Dialog) */}
+        <Dialog open={this.state.showModal} onClose={this.handleModalClose}>
+          <DialogTitle>Öğretmen Mesajı</DialogTitle>
+          <DialogContent>
+            <Typography>Öğrenciye özel mesaj içeriği burada yer alır.</Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleModalClose} color="secondary">
               Kapat
             </Button>
-          </Modal.Footer>
-        </Modal>
+          </DialogActions>
+        </Dialog>
       </div>
-      </>);
+    );
   }
 }
 
