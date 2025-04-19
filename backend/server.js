@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 
@@ -36,7 +37,18 @@ const loginLimiter = rateLimit({
 
 // Sadece /login rotasına rate limiting uygula
 app.use('/login', loginLimiter);
+// Ana Rotalar
+app.use('/api/auth', authRoutes); // /api/auth altındaki tüm istekleri authRoutes'a yönlendir
 
+// Basit bir test route'u
+app.get('/', (req, res) => {
+    res.send('Öğrenci Takip Sistemi Backend Çalışıyor!');
+});
+// Hata Yönetimi (Genel - Daha detaylı eklenebilir)
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Beklenmedik bir sunucu hatası oluştu!');
+});
 // --- Veritabanı Bağlantı Havuzu ---
 const dbPool = mysql.createPool({
   host: process.env.DB_HOST,

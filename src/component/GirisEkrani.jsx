@@ -1,5 +1,7 @@
 /* GirisEkrani.jsx */
 import React, { useState, useEffect } from 'react';
+import {Link as RouterLink} from 'react-router-dom';
+
 import axios from 'axios';
 import {
     Container,
@@ -110,7 +112,9 @@ const theme = createTheme({
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate(); // Yönlendirme fonksiyonunu al
   
-
+    const handleSignUp = () => {
+        navigate('/register');
+    }
   // Handler for login button click
   const handleLogin = async (event) => {
       event.preventDefault(); // Prevent default form submission
@@ -355,10 +359,10 @@ const theme = createTheme({
                                   Giriş Yap
                               </Button>
 
-                              {/* Optional: Link to Help/Support */}
+                              {/* Optional: Link to Sign up */}
                               <Box sx={{ textAlign: 'center', mt: 2 }}>
-                                  <Link href="#" variant="body2" color="text.secondary">
-                                      Yardım veya Destek için Tıklayın
+                                  <Link  component= {RouterLink} to ="/register"  variant="body2" color="text.secondary">
+                                       Kaydolmak  için Tıklayın
                                   </Link>
                               </Box>
 

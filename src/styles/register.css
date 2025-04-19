@@ -1,0 +1,87 @@
+/* src/styles/register.css */
+body {
+    background-color: #F8F9FA; /* Temel arka plan rengi */
+  }
+  
+  .register-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 16px; /* Mobil cihazlar için kenar boşluğu */
+  }
+  
+  .register-card {
+    width: 100%;
+    max-width: 450px; /* Masaüstünde formun çok genişlemesini önler */
+    padding: 32px;
+    text-align: center;
+    background-color: #ffffff; /* Kart arka planı */
+  }
+  
+  .register-form {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column; /* Mobil-first: Öğeler alt alta */
+    gap: 20px; /* Öğeler arası boşluk */
+  }
+  
+  .form-title {
+    color: #007BFF; /* Ana renk */
+    margin-bottom: 24px;
+  }
+  
+  .submit-button {
+    margin-top: 16px;
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Hover animasyonu */
+    background-color: #007BFF; /* Ana Renk */
+    color: white;
+  }
+  
+  .submit-button:hover {
+    background-color: #0056b3; /* Hover'da hafif koyulaşma */
+    transform: translateY(-2px); /* Hafif yukarı kalkma efekti */
+  }
+  
+  .submit-button:disabled {
+      background-color: #cccccc;
+      color: #666666;
+  }
+  
+  .error-message {
+    color: #DC3545; /* Hata rengi */
+    margin-top: 8px;
+    font-size: 0.875rem;
+    animation: fadeIn 0.5s ease-in-out; /* Fade-in animasyonu */
+  }
+  
+  .success-message {
+      color: #28A745; /* Yeşil renk */
+      margin-top: 8px;
+      font-size: 0.875rem;
+      animation: fadeIn 0.5s ease-in-out; /* Fade-in animasyonu */
+  }
+  
+  .loading-spinner {
+      margin: 16px auto;
+      color: #007BFF; /* Ana renk */
+  }
+  
+  /* Geçiş Animasyonları */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  /* Masaüstü ve Tablet için (Örnek: 768px ve üzeri) */
+  /* Bu örnekte form elemanları alt alta kalıyor çünkü genellikle daha kullanışlıdır.
+     Eğer farklı bölümler (örn. bilgi kutusu ve form) yan yana istenirse Grid kullanılabilir. */
+  /* @media (min-width: 768px) { */
+    /* .register-form { */
+      /* Eğer gerekirse burada layout değiştirilebilir, örn. Grid ile */
+    /* } */
+  /* } */

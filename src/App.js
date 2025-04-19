@@ -4,7 +4,10 @@ import GirisEkrani from './component/GirisEkrani';
 import Anasayfa from './component/Anasayfa';
 import VeliAnasayfa from './component/VeliAnasayfa';
 import YonetimAnasayfa from './component/YonetimAnasayfa';
-
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline'; // Temel CSS sıfırlaması ve arka plan rengi için
+import theme from './theme';
+import RegisterPage from './pages/RegisterPage';
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userType, setUserType] = useState(null);
@@ -62,21 +65,26 @@ function App() {
   else if (userType === 'yonetim') HomePageComponent = YonetimAnasayfa;
 
   return (
+    <ThemeProvider theme={theme}>
+            <CssBaseline /> {/* MUI tema renklerini ve temel stilleri uygular */}
     <BrowserRouter>
       <Routes>
         {!isLoggedIn ? (
           <>
-            <Route path="*" element={<GirisEkrani onLogin={handleLogin} />} />
+          <Route path="/register" element={<RegisterPage />} />
+             <Route path="*" element={<GirisEkrani onLogin={handleLogin} />} /> 
           </>
         ) : (
           <>
             <Route path="/login" element={<Navigate to="/dashboard" />} />
             <Route path="/dashboard" element={<HomePageComponent />} />
-            <Route path="*" element={<Navigate to="/dashboard" />} />
+           {/*  <Route path="*" element={<Navigate to="/dashboard" />} /> */}
+            <Route path="/register" element={<Navigate to="/dashboard" />} />
           </>
         )}
       </Routes>
     </BrowserRouter>
+    </ThemeProvider>
   );
 }
 
