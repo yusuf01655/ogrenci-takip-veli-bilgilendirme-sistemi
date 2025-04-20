@@ -3,12 +3,13 @@ const bcrypt = require('bcrypt');
 const pool = require('../config/db'); // Veritabanı havuzu
 
 const registerUser = async (req, res) => {
-    const { username, password, role } = req.body;
+    const { username, password, rol } = req.body;
+    console.log('Gelen form verisi:', req.body);
 
     try {
         // 1. Kullanıcı adı veritabanında var mı kontrol et
         const [existingUsers] = await pool.execute(
-            'SELECT username FROM users WHERE username = ?',
+            'SELECT username FROM user WHERE username = ?',
             [username]
         );
 
@@ -21,9 +22,9 @@ const registerUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
         // 3. Yeni kullanıcıyı veritabanına kaydet (SQL Injection önlenmiş şekilde)
-        const [result] = await pool.execute(
-            'INSERT INTO users (username, password, rol) VALUES (?, ?, ?)',
-            [username, hashedPassword, role]
+        const [result] = await pool.execute( //authController.js:24:37
+            'INSERT INTO user (username, password, rol) VALUES (?, ?, ?)',
+            [username, hashedPassword, rol]
         );
 
         console.log('Yeni kullanıcı kaydedildi:', result.insertId);

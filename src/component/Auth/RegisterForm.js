@@ -10,13 +10,13 @@ const RegisterForm = () => {
     const [formData, setFormData] = useState({
         username: '',
         password: '',
-        role: '', // Başlangıçta rol boş
+        rol: '', // Başlangıçta rol boş
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
-    const { username, password, role } = formData;
+    const { username, password, rol } = formData;
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -29,7 +29,7 @@ const RegisterForm = () => {
         setError('');
         setSuccess('');
 
-        if (!username || !password || !role) {
+        if (!username || !password || !rol) {
             setError('Tüm alanlar zorunludur.');
             return;
         }
@@ -38,10 +38,10 @@ const RegisterForm = () => {
         setLoading(true);
         try {
             // Backend API endpoint'i (yapılandırmanıza göre değişir)
-            const response = await axios.post('/api/auth/register', formData);
+            const response = await axios.post('http://localhost:5000/api/auth/register', formData);
             setSuccess(response.data.message || 'Kayıt başarıyla tamamlandı!');
             // Formu temizle
-            setFormData({ username: '', password: '', role: '' });
+            setFormData({ username: '', password: '', rol: '' });
             // İsteğe bağlı: Kullanıcıyı login sayfasına yönlendirme
             // setTimeout(() => { history.push('/login'); }, 2000);
         } catch (err) {
@@ -85,14 +85,16 @@ const RegisterForm = () => {
                         <Select
                             labelId="role-select-label"
                             id="role-select"
-                            value={role}
+                            value={rol}
                             label="Rol"
-                            name="role"
+                            name="rol"
                             onChange={handleChange}
                         >
                             <MenuItem value=""><em>Rol Seçin...</em></MenuItem>
-                            <MenuItem value="student">Öğrenci</MenuItem>
-                            <MenuItem value="parent">Veli</MenuItem>
+                            <MenuItem value="ogrenci">Öğrenci</MenuItem>
+                            <MenuItem value="veli">Veli</MenuItem>
+                            <MenuItem value="yonetici">Yönetici</MenuItem>
+                            <MenuItem value="ogretmen">Öğretmen</MenuItem>
                             {/* Gerekirse başka roller eklenebilir (admin vb.) */}
                         </Select>
                     </FormControl>
