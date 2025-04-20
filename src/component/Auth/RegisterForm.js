@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import {
     Box, Button, TextField, Typography, CircularProgress, Alert,
-    FormControl, InputLabel, Select, MenuItem, Card, CardContent
+    FormControl, InputLabel, Select, MenuItem, Card, CardContent, Link
 } from '@mui/material';
 import LockOpenIcon from '@mui/icons-material/LockOpen'; // Minimalist ikon örneği
-
+import {Link as RouterLink} from 'react-router-dom';
 const RegisterForm = () => {
     const [formData, setFormData] = useState({
         username: '',
@@ -115,6 +115,11 @@ const RegisterForm = () => {
                         {loading ? 'Kaydediliyor...' : 'Kaydol'}
                     </Button>
                 </Box>
+                <Box sx={{ textAlign: 'center', mt: 2 }}>
+                                  <Link  component= {RouterLink} to ="/login"  variant="body2" color="text.secondary">
+                                       Giriş yapmak  için Tıklayın
+                                  </Link>
+                              </Box>
             </CardContent>
         </Card>
     );
