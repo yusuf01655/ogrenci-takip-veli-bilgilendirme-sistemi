@@ -101,7 +101,7 @@ app.post('/login', async (req, res) => {
 
     // 2. Şifreyi karşılaştır
     const isPasswordMatch = await bcrypt.compare(password, user.password);
-    console.log(password+' '+ user.password);
+    console.log(password+' '+ user.password +"   "+ user.rol);
     /* if (!isPasswordMatch) { yorumu kaldır
       // Şifre yanlış
       return res.status(401).json({ message: 'Geçersiz e-posta veya şifre.' });
@@ -127,7 +127,8 @@ app.post('/login', async (req, res) => {
     // 5. Token'ı döndür
     res.status(200).json({
       message: 'Giriş başarılı!',
-      token: token
+      token: token,
+      rol: user.rol
     });
 
   } catch (error) {

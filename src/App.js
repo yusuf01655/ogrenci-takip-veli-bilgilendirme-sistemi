@@ -4,6 +4,7 @@ import GirisEkrani from './component/GirisEkrani';
 import Anasayfa from './component/Anasayfa';
 import VeliAnasayfa from './component/VeliAnasayfa';
 import YonetimAnasayfa from './component/YonetimAnasayfa';
+import OgretmenAnasayfa from './component/OgretmenAnasayfa';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline'; // Temel CSS sıfırlaması ve arka plan rengi için
 import theme from './theme';
@@ -62,8 +63,9 @@ function App() {
 
   let HomePageComponent = Anasayfa;
   if (userType === 'veli') HomePageComponent = VeliAnasayfa;
-  else if (userType === 'yonetim') HomePageComponent = YonetimAnasayfa;
-
+  else if (userType === 'yonetici') HomePageComponent = YonetimAnasayfa;
+  else if (userType === 'ogretmen') HomePageComponent = OgretmenAnasayfa;
+  console.log('userType: ' + userType);
   return (
     <ThemeProvider theme={theme}>
             <CssBaseline /> {/* MUI tema renklerini ve temel stilleri uygular */}

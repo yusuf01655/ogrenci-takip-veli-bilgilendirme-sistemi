@@ -98,6 +98,14 @@ const YonetimAnasayfa = () => {
   const handleUserMenuClose = () => {
     setAnchorEl(null);
   };
+  const handleUserMenuCloseCikisYap = () => {
+    setAnchorEl(null);
+// JWT'yi temizle
+localStorage.removeItem('authToken'); // ya da sessionStorage
+  
+// Giriş sayfasına yönlendir
+window.location.href = '/login';
+  };
 
   // İçerik değiştirme
   const handleMenuClick = (contentKey) => {
@@ -352,7 +360,7 @@ const YonetimAnasayfa = () => {
               >
                 <MenuItem onClick={handleUserMenuClose}>Profil</MenuItem>
                 <MenuItem onClick={handleUserMenuClose}>Hesap Ayarları</MenuItem>
-                <MenuItem onClick={handleUserMenuClose}>
+                <MenuItem onClick={handleUserMenuCloseCikisYap}>
                    <ListItemIcon>
                       <ExitToAppIcon fontSize="small" />
                    </ListItemIcon>

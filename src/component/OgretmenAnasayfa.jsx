@@ -11,7 +11,7 @@ import {
   Clipboard, BarChart, Mail 
 } from 'react-feather';
 
-const VeliAnasayfa = () => {
+const OgretmenAnasayfa = () => {
   const todaySchedule = [
     { time: '09:00', lesson: 'Matematik', teacher: 'Ahmet Yılmaz' },
     { time: '10:30', lesson: 'Fen Bilgisi', teacher: 'Ayşe Demir' },
@@ -21,7 +21,7 @@ const VeliAnasayfa = () => {
     { title: 'Matematik Problemleri', status: 'Tamamlandı', color: 'success' },
     { title: 'Deney Raporu', status: 'Bekliyor', color: 'warning' },
   ];
-
+  
   const handleLogout = () => {
     // JWT'yi temizle
     localStorage.removeItem('authToken'); // ya da sessionStorage
@@ -31,11 +31,12 @@ const VeliAnasayfa = () => {
 
     
   }
+
   return (
     <>
       <Navbar expand="lg" className="px-4">
         <Navbar.Brand href="#home" className="text-primary fw-bold">
-          Veli Portalı
+          Öğretmen Portalı
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
@@ -87,7 +88,7 @@ const VeliAnasayfa = () => {
 
           {/* Ana İçerik */}
           <Col md={5} className="main-content">
-            <h4 className="mb-4">Hoş Geldiniz, Sayın Veli</h4>
+            <h4 className="mb-4">Hoş Geldiniz, Sayın Öğretmen</h4>
             
             <Card className="mb-4">
               <Card.Body>
@@ -169,4 +170,4 @@ const VeliAnasayfa = () => {
   );
 };
 
-export default VeliAnasayfa;
+export default OgretmenAnasayfa;

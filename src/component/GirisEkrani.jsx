@@ -155,7 +155,9 @@ const theme = createTheme({
         // sessionStorage: Sekme/tarayıcı kapatılınca silinir.
         localStorage.setItem('authToken', response.data.token);
         // veya: sessionStorage.setItem('authToken', response.data.token);
-        onLogin('ogrenci', response.data.token); // userType parametresi önemli
+        const userRole = response.data.rol;
+        console.log('backendden gelen Kullanıcı Rolü:', userRole);
+        onLogin(userRole, response.data.token); // userType parametresi önemli
         // Kullanıcıyı Ana Sayfaya Yönlendir
         navigate('/dashboard'); // Veya hedef sayfanız neyse ('/home', '/profile' vb.)
 
