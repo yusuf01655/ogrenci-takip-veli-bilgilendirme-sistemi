@@ -1,131 +1,84 @@
-/* Genel Stil Ayarları */
+/* yoneticianasayfa.css */
 body {
-    margin: 0;
-    font-family: 'Roboto', sans-serif; /* Material UI temasıyla aynı font */
-    background-color: #F8F9FA; /* Açık Gri Arka Plan */
+  background-color: #F8F9FA; /* Tema ile uyumlu */
+}
+
+/* Genel Kutu Gölgeleri ve Hover Efektleri */
+.hover-effect-card {
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out !important;
+}
+
+.hover-effect-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Hızlı Eylem Butonları Hover */
+.quick-action-button {
+  transition: transform 0.2s ease-in-out, background-color 0.3s ease !important;
+}
+
+.quick-action-button:hover {
+  transform: scale(1.05);
+  /* Renkler tema üzerinden MuiButton'da tanımlandı ama gerekirse burada ezilebilir */
+}
+
+/* Bildirimler/Uyarılar için Animasyon (Örnek) */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-  
-  /* Sol Menü Stilleri */
-  .drawer-container {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  .menu-item.Mui-selected {
-    background-color: rgba(0, 123, 255, 0.1) !important; /* Seçili öğe arka planı */
-    border-right: 3px solid #007BFF; /* Seçili öğe için mavi kenarlık */
-    color: #007BFF; /* Seçili öğe metin rengi */
+}
+
+.fade-in-item {
+  animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+/* Sidebar için stil (Gerekirse) */
+.sidebar-drawer {
+  /* Özel stil gerekirse buraya eklenebilir */
+}
+
+/* İkon Stilleri */
+.icon-minimalist {
+  /* Minimalist ikonlar için özel bir stil gerekirse */
+}
+
+/* Sayfa Geçişleri (React Router veya başka bir kütüphane ile daha etkili olur) */
+/* Bu CSS dosyası tek başına sayfa geçiş animasyonu sağlamaz ama eleman animasyonları için kullanılabilir. */
+
+/* Grafik Alanı */
+.chart-container {
+  min-height: 250px; /* Grafik için minimum yükseklik */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff; /* Kart içi beyaz */
+  border-radius: 8px; /* Tema ile uyumlu */
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Vurgulu Bildirimler */
+.alert-warning {
+    border-left: 4px solid #FFA500; /* Turuncu vurgu */
+    background-color: #fff3e0; /* Hafif turuncu arka plan */
+}
+
+.alert-info {
+    border-left: 4px solid #007BFF; /* Mavi vurgu */
+    background-color: #e7f3ff; /* Hafif mavi arka plan */
+}
+
+/* Mobil için Stacked Layout (Grid zaten hallediyor ama gerekirse ek ince ayar) */
+@media (max-width: 600px) {
+  /* Mobil özel stiller buraya eklenebilir */
+  .dashboard-summary-card {
+      /* Mobil için özel ayar gerekirse */
   }
-  
-  .menu-item.Mui-selected .MuiListItemIcon-root {
-      color: #007BFF; /* Seçili ikon rengi */
-  }
-  
-  .menu-item .MuiListItemIcon-root {
-    min-width: 40px; /* İkonlar için minimum genişlik */
-  }
-  
-  /* Üst Bar (AppBar) Geçiş Efekti */
-  .app-bar-transition {
-      transition: box-shadow 0.3s ease-in-out;
-  }
-  
-  /* İkon Buton Hover Efekti */
-  .icon-button-hover:hover {
-      background-color: rgba(0, 0, 0, 0.04); /* Hafif gri arka plan */
-      transition: background-color 0.2s ease;
-  }
-  
-  /* Ana İçerik Alanı Stilleri */
-  .main-content {
-    padding: 24px; /* İçerik etrafında ferah boşluk */
-  }
-  
-  /* Genel Bakış İstatistik Kartları */
-  .stat-card {
-    padding: 20px;
-    text-align: center;
-    color: white; /* Genel metin rengi beyaz */
-    border-radius: 12px; /* Yuvarlak köşeler */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Hover efekti için geçiş */
-    cursor: pointer; /* Tıklanabilir hissi */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 150px; /* Minimum yükseklik */
-  }
-  
-  .stat-card:hover {
-      transform: translateY(-5px); /* Hafif yukarı kalkma efekti */
-      box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1); /* Daha belirgin gölge */
-  }
-  
-  .stat-card .MuiSvgIcon-root { /* İkon boyutu ve alt boşluk */
-      font-size: 2.5rem;
-      margin-bottom: 8px;
-  }
-  
-  .stat-card h6 { /* Sayı font kalınlığı */
-      font-weight: 600;
-      margin-bottom: 4px;
-  }
-  
-  /* Farklı Renklerde İstatistik Kartları */
-  .stat-card-blue { background: linear-gradient(135deg, #007BFF, #0056b3); } /* Mavi */
-  .stat-card-green { background: linear-gradient(135deg, #28A745, #1c7430); } /* Yeşil */
-  .stat-card-orange { background: linear-gradient(135deg, #FFA500, #cc8400); } /* Turuncu */
-  .stat-card-purple { background: linear-gradient(135deg, #6f42c1, #5a349a); } /* Mor (Örnek ek renk) */
-  
-  
-  /* İçerik Geçiş Animasyonu */
-  .content-transition {
-    animation: fadeIn 0.5s ease-out; /* Hafif fade-in animasyonu */
-  }
-  
-  /* Fade-in Animasyon Keyframes */
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px); /* Hafif aşağıdan gelme efekti */
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  /* CSS'te fade-in sınıfı (Menü, Modallar vb. için kullanılabilir) */
-  .fade-in {
-      animation: fadeIn 0.4s ease-in-out;
-  }
-  
-  
-  /* Mobil Cihazlar İçin Ekstra Ayarlamalar (Örnek) */
-  @media (max-width: 600px) {
-    .main-content {
-      padding: 16px; /* Mobilde daha az boşluk */
-    }
-  
-    .stat-card {
-      min-height: 120px; /* Mobilde kart yüksekliği biraz daha az */
-      padding: 15px;
-    }
-  
-     .stat-card .MuiSvgIcon-root {
-      font-size: 2rem; /* Mobilde ikonlar biraz daha küçük */
-    }
-  
-    .stat-card h6 {
-      font-size: 1.1rem; /* Mobilde sayı fontu biraz daha küçük */
-    }
-  }
-  
-  /* Tablet Görünümü İçin Ayarlamalar (Örnek) */
-  @media (min-width: 601px) and (max-width: 960px) {
-      .stat-card {
-          min-height: 140px;
-      }
-  }
-  
+}

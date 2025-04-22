@@ -1,407 +1,228 @@
 import React, { useState } from 'react';
 import {
-    AppBar, Toolbar, IconButton, Typography, Drawer, List, ListItem, ListItemIcon,
-    ListItemText, CssBaseline, Box, Container, Grid, Paper, Avatar, Badge, Menu, MenuItem, Tooltip, createTheme, ThemeProvider
-  } from '@mui/material';
-  import MenuIcon from '@mui/icons-material/Menu';
-  import NotificationsIcon from '@mui/icons-material/Notifications';
-  import MessageIcon from '@mui/icons-material/Message';
-  import SettingsIcon from '@mui/icons-material/Settings';
-  import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-  import DashboardIcon from '@mui/icons-material/Dashboard';
-  import PeopleIcon from '@mui/icons-material/People'; // Öğrenci Yönetimi
-  import SchoolIcon from '@mui/icons-material/School'; // Öğretmen Yönetimi
-  import ContactMailIcon from '@mui/icons-material/ContactMail'; // Veli İletişimi
-  import AssessmentIcon from '@mui/icons-material/Assessment'; // Raporlar
-  import EventIcon from '@mui/icons-material/Event'; // Etkinlikler
-  import AnnouncementIcon from '@mui/icons-material/Announcement'; // Duyurular
-  import WarningIcon from '@mui/icons-material/Warning'; // Uyarılar
-  import BarChartIcon from '@mui/icons-material/BarChart'; // İstatistikler için
-  import './style/YoneticiAnasayfa.css'; // Özel stiller için
+  AppBar, Toolbar, IconButton, Typography, Drawer, List, ListItem, ListItemButton,
+  ListItemIcon, ListItemText, Box, CssBaseline, ThemeProvider, Grid, Card, CardContent,
+  Button, Paper, Avatar, Chip, Divider, useTheme, useMediaQuery, Fade
+} from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
+import SchoolIcon from '@mui/icons-material/School'; // Okul Logosu
+import AccountCircle from '@mui/icons-material/AccountCircle';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import DashboardIcon from '@mui/icons-material/Dashboard'; // Anasayfa
+import PeopleIcon from '@mui/icons-material/People'; // Öğrenci
+import PersonIcon from '@mui/icons-material/Person'; // Öğretmen
+import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount'; // Veli
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday'; // Ders Programı / Takvim
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'; // Yoklama
+import AssignmentIcon from '@mui/icons-material/Assignment'; // Not
+import CampaignIcon from '@mui/icons-material/Campaign'; // Duyuru
+import AssessmentIcon from '@mui/icons-material/Assessment'; // Raporlar
+import SettingsIcon from '@mui/icons-material/Settings'; // Ayarlar
+import AddIcon from '@mui/icons-material/Add';
+// VisibilityIcon kullanılmamış, gerekirse eklenebilir.
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import InfoIcon from '@mui/icons-material/Info';
+import EventNoteIcon from '@mui/icons-material/EventNote';
+import BarChartIcon from '@mui/icons-material/BarChart'; // Grafik ikonu
+import './style/yoneticianasayfa.css';
+// Varsayılan tema veya kendi temanız (import path doğru olmalı)
+ import customTheme from '../theme';
+// Geçici olarak Material UI varsayılan temasını kullanalım
+import { createTheme } from '@mui/material/styles';
+const defaultTheme = createTheme(); // VEYA: import customTheme from '../theme';
 
-// Kurumsal Renk Paleti ve Tipografi ile Tema Oluşturma
-const theme = createTheme({
-    palette: {
-      primary: {
-        main: '#007BFF', // Ana Renk: Mavi
-      },
-      secondary: {
-        main: '#28A745', // Tamamlayıcı Renk: Yeşil
-      },
-      background: {
-        default: '#F8F9FA', // Arka Plan Rengi: Açık Gri
-      },
-      error: {
-        main: '#FFA500', // Vurgu Rengi: Turuncu (Uyarılar için kullanılabilir)
-      },
-      text: {
-        primary: '#212529',
-        secondary: '#6c757d',
-      },
-    },
-    typography: {
-      fontFamily: 'Roboto, sans-serif', // Tipografi: Roboto
-    },
-    components: {
-      MuiPaper: {
-        styleOverrides: {
-          root: {
-            borderRadius: '12px', // Köşeleri yuvarlak kartlar ve paneller
-          },
-        },
-      },
-      MuiButton: {
-        styleOverrides: {
-          root: {
-            borderRadius: '8px', // Köşeleri yuvarlak butonlar
-            textTransform: 'none', // Buton metinleri normal kalsın
-          },
-        },
-      },
-      MuiDrawer: {
-        styleOverrides: {
-          paper: {
-            borderRight: 'none', // Kenarlığı kaldır
-          }
-        }
-      },
-       MuiListItem: { // Hover efekti için
-          styleOverrides: {
-              root: {
-                  '&:hover': {
-                      backgroundColor: 'rgba(0, 123, 255, 0.08)', // Hafif mavi arka plan
-                      transition: 'background-color 0.3s ease', // Geçiş efekti
-                  },
-              },
-          },
-       },
-    },
-  });
-  const drawerWidth = 240; // Sol menü genişliği
-const YonetimAnasayfa = () => {
-    const [mobileOpen, setMobileOpen] = useState(false); // Mobil menü durumu
-  const [selectedContent, setSelectedContent] = useState('genelBakis'); // Gösterilecek içerik
-  const [anchorEl, setAnchorEl] = useState(null); // Kullanıcı menüsü için
-  const userMenuOpen = Boolean(anchorEl);
+// CSS dosyasının yolu doğru olmalı
 
-  // Mobil menüyü aç/kapat
+// Geçici olarak CSS importunu yorum satırına alalım veya yolu düzeltin
+
+
+const drawerWidth = 240;
+
+function YoneticiAnasayfa() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const theme = useTheme(); // Temayı içeride kullanmak için
+  // isMobile değişkeni doğrudan kullanılmıyor gibi, ama kalsın
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
-  // Kullanıcı menüsünü aç
-  const handleUserMenu = (event) => {
-    setAnchorEl(event.currentTarget);
+  // --- Örnek Veriler (Değişiklik Yok) ---
+  const yöneticiAdi = "Ahmet Yılmaz";
+  const okulAdi = "Gelecek Koleji";
+  const kpiData = {
+    ogrenciSayisi: 1250,
+    ogretmenSayisi: 85,
+    sinifSayisi: 40,
+    devamsizlikOrani: 3.5,
   };
-
-  // Kullanıcı menüsünü kapat
-  const handleUserMenuClose = () => {
-    setAnchorEl(null);
-  };
-  const handleUserMenuCloseCikisYap = () => {
-    setAnchorEl(null);
-// JWT'yi temizle
-localStorage.removeItem('authToken'); // ya da sessionStorage
-  
-// Giriş sayfasına yönlendir
-window.location.href = '/login';
-  };
-
-  // İçerik değiştirme
-  const handleMenuClick = (contentKey) => {
-    setSelectedContent(contentKey);
-    if (mobileOpen) { // Mobil menü açıksa kapat
-        setMobileOpen(false);
-    }
-  };
-
-  // Sol Menü Öğeleri
-  const menuItems = [
-    { text: 'Genel Bakış', icon: <DashboardIcon />, key: 'genelBakis' },
-    { text: 'Öğrenci Yönetimi', icon: <PeopleIcon />, key: 'ogrenciYonetimi' },
-    { text: 'Öğretmen Yönetimi', icon: <SchoolIcon />, key: 'ogretmenYonetimi' },
-    { text: 'Veli İletişimi', icon: <ContactMailIcon />, key: 'veliIletisimi' },
-    { text: 'Raporlar ve Analiz', icon: <AssessmentIcon />, key: 'raporlar' },
-    { text: 'Sistem Ayarları', icon: <SettingsIcon />, key: 'ayarlar' },
+  const bildirimler = [
+    { id: 1, type: 'onay', text: 'Yeni Öğrenci Kaydı Onay Bekliyor: Elif Su', status: 'warning' },
+    { id: 2, type: 'uyari', text: 'Ali Veli (10-A) devamsızlık sınırına yaklaştı.', status: 'warning' },
+    { id: 3, type: 'mesaj', text: 'Sistem güncellemesi: v2.1 yayında.', status: 'info' },
+    { id: 4, type: 'onay', text: 'Öğretmen İzin Talebi: Ayşe Kaya', status: 'warning' },
+  ];
+  const duyurular = [
+    { id: 1, title: '23 Nisan Tören Provası Hk.', date: '2025-04-20' },
+    { id: 2, title: 'Veli Toplantısı Tarihleri Güncellendi', date: '2025-04-18' },
+    { id: 3, title: 'Yeni Yemekhane Menüsü', date: '2025-04-15' },
+  ];
+  const etkinlikler = [
+    { id: 1, title: 'Genel Veli Toplantısı', date: '2025-04-28' },
+    { id: 2, title: 'Resim Sergisi Açılışı', date: '2025-05-05' },
+    { id: 3, title: 'Okul Gezisi (Anıtkabir)', date: '2025-05-10' },
   ];
 
-  // Sol Menü İçeriği
-  const drawer = (
-    <div className="drawer-container">
-      <Toolbar sx={{ justifyContent: 'center', py: 2 }}>
-         {/* Buraya okul logosu eklenebilir */}
-         <Typography variant="h6" noWrap component="div" color="primary">
-           Okul Yönetim
+  // --- Helper Fonksiyonlar (Değişiklik Yok) ---
+   const getIconForNotification = (status) => {
+     switch (status) {
+        case 'warning': return <WarningAmberIcon color="warning" sx={{ mr: 1 }} />;
+        case 'info': return <InfoIcon color="info" sx={{ mr: 1 }} />;
+        default: return <NotificationsIcon color="action" sx={{ mr: 1 }} />;
+     }
+  }
+  const getAlertClass = (status) => {
+      switch (status) {
+        case 'warning': return 'alert-warning';
+        case 'info': return 'alert-info';
+        default: return '';
+     }
+  }
+  const handleLogout = () => {
+    // JWT'yi temizle
+    localStorage.removeItem('authToken'); // ya da sessionStorage
+  
+    // Giriş sayfasına yönlendir
+    window.location.href = '/login';
+
+    
+  }
+
+  // --- Kenar Çubuğu İçeriği ---
+  const drawerContent = (
+    <div>
+      {/* === DEĞİŞİKLİK 1: AppBar boşluğu için standart Toolbar eklendi === */}
+      <Toolbar />
+      {/* === Mevcut Toolbar'ınız (Başlık vb. için) === */}
+      <Toolbar sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 4 }}>
+      
+         <SchoolIcon sx={{ mr: 1, color: 'primary.main' }} />
+         <Typography variant="h6" noWrap component="div" color="primary.main">
+            Yönetim Paneli
          </Typography>
       </Toolbar>
-      <List>
-        {menuItems.map((item) => (
-          <ListItem
-            button
-            key={item.key}
-            onClick={() => handleMenuClick(item.key)}
-            selected={selectedContent === item.key} // Seçili öğeyi vurgula
-            className="menu-item"
-          >
-            <ListItemIcon sx={{ color: selectedContent === item.key ? 'primary.main' : 'inherit' }}>
-              {item.icon}
-            </ListItemIcon>
-            <ListItemText primary={item.text} />
+      <Divider />
+      <List >
+        {[
+          { text: 'Anasayfa', icon: <DashboardIcon />, path: '/' },
+          { text: 'Öğrenci İşlemleri', icon: <PeopleIcon />, path: '/ogrenciler' },
+          { text: 'Öğretmen İşlemleri', icon: <PersonIcon />, path: '/ogretmenler' },
+          { text: 'Veli İşlemleri', icon: <SupervisorAccountIcon />, path: '/veliler' },
+          { text: 'Ders Programı', icon: <CalendarTodayIcon />, path: '/ders-programi' },
+          { text: 'Yoklama İşlemleri', icon: <CheckCircleOutlineIcon />, path: '/yoklama' },
+          { text: 'Not İşlemleri', icon: <AssignmentIcon />, path: '/notlar' },
+          { text: 'Duyurular', icon: <CampaignIcon />, path: '/duyurular' },
+          { text: 'Raporlar', icon: <AssessmentIcon />, path: '/raporlar' },
+          { text: 'Sistem Ayarları', icon: <SettingsIcon />, path: '/ayarlar' },
+        ].map((item, index) => (
+          <ListItem key={item.text} disablePadding>
+            {/* Navigasyon için React Router <Link> kullanmak daha iyidir */}
+            <ListItemButton component="a" href={item.path} selected={item.text === 'Anasayfa'}>
+              <ListItemIcon sx={{ minWidth: '40px' }}>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.text} />
+            </ListItemButton>
           </ListItem>
         ))}
       </List>
     </div>
   );
 
-  // Ana İçerik Alanı
-  const renderContent = () => {
-    switch (selectedContent) {
-      case 'ogrenciYonetimi':
-        return <Typography variant="h5" gutterBottom>Öğrenci Yönetimi Alanı</Typography>;
-      case 'ogretmenYonetimi':
-        return <Typography variant="h5" gutterBottom>Öğretmen Yönetimi Alanı</Typography>;
-      case 'veliIletisimi':
-        return <Typography variant="h5" gutterBottom>Veli İletişimi Alanı</Typography>;
-      case 'raporlar':
-        return <Typography variant="h5" gutterBottom>Raporlar ve Analiz Alanı</Typography>;
-      case 'ayarlar':
-        return <Typography variant="h5" gutterBottom>Sistem Ayarları Alanı</Typography>;
-      case 'genelBakis':
-      default:
-        return (
-          <Box>
-            <Typography variant="h5" gutterBottom sx={{ mb: 3 }}>Genel Bakış</Typography>
-            {/* İstatistik Kartları - Mobil: Alt alta, Masaüstü: Yan yana */}
-            <Grid container spacing={3} className="stats-grid">
-              <Grid item xs={12} sm={6} md={3}>
-                <Paper elevation={2} className="stat-card stat-card-blue">
-                  <PeopleIcon fontSize="large" />
-                  <Typography variant="h6">1250</Typography>
-                  <Typography variant="body2">Toplam Öğrenci</Typography>
-                </Paper>
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
-                <Paper elevation={2} className="stat-card stat-card-green">
-                  <SchoolIcon fontSize="large" />
-                  <Typography variant="h6">85</Typography>
-                  <Typography variant="body2">Toplam Öğretmen</Typography>
-                </Paper>
-              </Grid>
-               <Grid item xs={12} sm={6} md={3}>
-                <Paper elevation={2} className="stat-card stat-card-orange">
-                  <WarningIcon fontSize="large" />
-                  <Typography variant="h6">15</Typography>
-                  <Typography variant="body2">Bugünkü Devamsızlık</Typography>
-                </Paper>
-              </Grid>
-               <Grid item xs={12} sm={6} md={3}>
-                <Paper elevation={2} className="stat-card stat-card-purple">
-                  <ContactMailIcon fontSize="large" />
-                  <Typography variant="h6">2100</Typography>
-                  <Typography variant="body2">Toplam Veli</Typography>
-                </Paper>
-              </Grid>
-            </Grid>
-
-            {/* Diğer Bölümler (Duyurular, Etkinlikler, Hızlı Erişim vb.) */}
-            <Grid container spacing={3} sx={{ mt: 2 }}>
-              {/* Yaklaşan Etkinlikler */}
-              <Grid item xs={12} md={6}>
-                <Paper elevation={1} sx={{ p: 2 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <EventIcon sx={{ mr: 1, color: 'primary.main' }} />
-                    <Typography variant="h6">Yaklaşan Etkinlikler</Typography>
-                  </Box>
-                  <List dense>
-                    <ListItem>
-                      <ListItemText primary="Veli Toplantısı" secondary="15 Nisan 2025 - 18:00" />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText primary="Bilim Fuarı" secondary="22 Nisan 2025 - Tüm Gün" />
-                    </ListItem>
-                     <ListItem>
-                      <ListItemText primary="Mezuniyet Töreni Provası" secondary="30 Nisan 2025 - 14:00" />
-                    </ListItem>
-                  </List>
-                </Paper>
-              </Grid>
-
-              {/* Son Duyurular */}
-              <Grid item xs={12} md={6}>
-                 <Paper elevation={1} sx={{ p: 2 }}>
-                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                     <AnnouncementIcon sx={{ mr: 1, color: 'secondary.main' }} />
-                     <Typography variant="h6">Son Duyurular</Typography>
-                   </Box>
-                   <List dense>
-                    <ListItem>
-                      <ListItemText primary="23 Nisan Tören Programı Yayınlandı" secondary="5 Nisan 2025" />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText primary="Kantin Fiyatları Güncellendi" secondary="4 Nisan 2025" />
-                    </ListItem>
-                     <ListItem>
-                      <ListItemText primary="Yeni Servis Güzergahları" secondary="1 Nisan 2025" />
-                    </ListItem>
-                  </List>
-                 </Paper>
-              </Grid>
-
-               {/* Önemli Uyarılar */}
-              <Grid item xs={12}>
-                 <Paper elevation={1} sx={{ p: 2, borderColor: 'error.main', borderWidth: 1, borderStyle: 'solid' }} className="fade-in">
-                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                     <WarningIcon sx={{ mr: 1, color: 'error.main' }} />
-                     <Typography variant="h6" sx={{color: 'error.main'}}>Önemli Uyarılar</Typography>
-                   </Box>
-                   <Typography variant="body2">- 11-B Sınıfında artan devamsızlık oranları.</Typography>
-                   <Typography variant="body2">- Matematik dersi not ortalaması genel düşüşte.</Typography>
-                 </Paper>
-              </Grid>
-
-               {/* Basit Grafik Alanı (Placeholder) */}
-               <Grid item xs={12}>
-                 <Paper elevation={1} sx={{ p: 2 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                     <BarChartIcon sx={{ mr: 1, color: 'primary.main' }} />
-                     <Typography variant="h6">Genel Başarı Durumu (Örnek)</Typography>
-                   </Box>
-                   {/* Buraya bir grafik kütüphanesi (örn: Recharts) entegre edilebilir */}
-                   <Box sx={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#e9ecef', borderRadius: 1 }}>
-                       <Typography color="textSecondary">Grafik Alanı</Typography>
-                   </Box>
-                 </Paper>
-               </Grid>
-            </Grid>
-          </Box>
-        );
-    }
-  };
-
   return (
-    <ThemeProvider theme={theme}>
+    // Tema Sağlayıcı: Kendi temanızı kullanıyorsanız 'defaultTheme' yerine 'customTheme' yazın
+    <ThemeProvider theme={defaultTheme}>
       <Box sx={{ display: 'flex' }}>
-        <CssBaseline /> {/* Tarayıcı varsayılan stillerini sıfırlar */}
-
-        {/* Üst Bar */}
+        <CssBaseline />
+        {/* Header */}
         <AppBar
           position="fixed"
           sx={{
-            zIndex: (theme) => theme.zIndex.drawer + 1, // Menünün üzerinde kalması için
-            backgroundColor: 'white', // Beyaz AppBar
-            color: 'text.primary', // Metin rengi
-            boxShadow: '0px 2px 4px -1px rgba(0,0,0,0.1)', // Hafif gölge
+            // === DEĞİŞİKLİK 2: Kalıcı Drawer varken AppBar genişliğini ve margin'ini ayarla ===
+            width: { md: `calc(100% - ${drawerWidth}px)` }, // Masaüstünde genişliği ayarla
+            ml: { md: `${drawerWidth}px` },                // Masaüstünde soldan boşluk bırak
+            // ============================================================================
+            zIndex: (theme) => theme.zIndex.drawer + 1,
+            backgroundColor: 'white',
+            color: theme.palette.text.primary,
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
           }}
-          className="app-bar-transition" // CSS'ten animasyon sınıfı
         >
           <Toolbar>
-            {/* Mobil Menü Butonu */}
             <IconButton
               color="inherit"
-              aria-label="menüyü aç"
+              aria-label="open drawer"
               edge="start"
               onClick={handleDrawerToggle}
-              sx={{ mr: 2, display: { md: 'none' } }} // Sadece mobilde göster
+              sx={{ mr: 2, display: { md: 'none' } }} // Sadece mobilde/tablette göster
             >
               <MenuIcon />
             </IconButton>
-
-            {/* Başlık (Opsiyonel, logo yerine veya ek olarak) */}
-             <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}>
-              Yönetici Paneli
+            <SchoolIcon sx={{ mr: 1, display: { xs: 'none', sm: 'block' } }} color="primary"/>
+            <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+              {okulAdi} Yönetim Sistemi
             </Typography>
-
-            <Box sx={{ flexGrow: 1 }} /> {/* Sağdaki ikonları sağa iter */}
-
-            {/* Sağ Üst İkonlar */}
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-               <Tooltip title="Mesajlar">
-                 <IconButton color="inherit" sx={{ mr: 1 }} className="icon-button-hover">
-                   <Badge badgeContent={4} color="secondary"> {/* Örnek bildirim sayısı */}
-                     <MessageIcon />
-                   </Badge>
-                 </IconButton>
-               </Tooltip>
-              <Tooltip title="Bildirimler">
-                <IconButton color="inherit" sx={{ mr: 1 }} className="icon-button-hover">
-                  <Badge badgeContent={17} color="error"> {/* Örnek bildirim sayısı */}
-                    <NotificationsIcon />
-                  </Badge>
-                </IconButton>
-              </Tooltip>
-               <Tooltip title="Ayarlar">
-                 <IconButton color="inherit" sx={{ mr: 1 }} className="icon-button-hover" onClick={() => handleMenuClick('ayarlar')}>
-                    <SettingsIcon />
-                 </IconButton>
-               </Tooltip>
-
-              {/* Kullanıcı Profili ve Menüsü */}
-              <Tooltip title="Kullanıcı Profili">
-                <IconButton onClick={handleUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="Yönetici Adı" src="/static/images/avatar/2.jpg" /> {/* Placeholder avatar */}
-                </IconButton>
-              </Tooltip>
-              <Menu
-                sx={{ mt: '45px' }}
-                id="menu-appbar"
-                anchorEl={anchorEl}
-                anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                open={userMenuOpen}
-                onClose={handleUserMenuClose}
-                className="fade-in" // CSS'ten animasyon sınıfı
-              >
-                <MenuItem onClick={handleUserMenuClose}>Profil</MenuItem>
-                <MenuItem onClick={handleUserMenuClose}>Hesap Ayarları</MenuItem>
-                <MenuItem onClick={handleUserMenuCloseCikisYap}>
-                   <ListItemIcon>
-                      <ExitToAppIcon fontSize="small" />
-                   </ListItemIcon>
-                   Çıkış Yap
-                </MenuItem>
-              </Menu>
-            </Box>
+             <Chip
+                 avatar={<Avatar><AccountCircle /></Avatar>}
+                 label={yöneticiAdi}
+                 variant="outlined"
+                 sx={{ mr: 2, display: { xs: 'none', sm: 'flex' } }}
+             />
+            <IconButton onClick={handleLogout} color="inherit" title="Çıkış Yap">
+              <ExitToAppIcon />
+            </IconButton>
           </Toolbar>
         </AppBar>
 
-        {/* Sol Menü (Drawer) */}
+        {/* Sidebar */}
         <Box
           component="nav"
           sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
-          aria-label="ana menü"
+          aria-label="main navigation"
         >
-          {/* Mobil için Geçici Menü */}
+          {/* Mobil için Geçici Drawer (Değişiklik Yok) */}
           <Drawer
             variant="temporary"
             open={mobileOpen}
             onClose={handleDrawerToggle}
             ModalProps={{
-              keepMounted: true, // Performans için mobil cihazlarda daha iyi.
+              keepMounted: true,
             }}
             sx={{
               display: { xs: 'block', md: 'none' },
               '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, borderRight: 'none' },
             }}
+            className="sidebar-drawer"
           >
-            {drawer}
+            {drawerContent}
           </Drawer>
-          {/* Masaüstü için Kalıcı Menü */}
+          {/* Masaüstü için Kalıcı Drawer (Değişiklik Yok) */}
           <Drawer
             variant="permanent"
             sx={{
               display: { xs: 'none', md: 'block' },
-              '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, borderRight: 'none', backgroundColor: '#fff', boxShadow: '2px 0px 5px rgba(0,0,0,0.05)' }, // Hafif sağ gölge
+              '& .MuiDrawer-paper': {
+                  boxSizing: 'border-box',
+                  width: drawerWidth,
+                  borderRight: 'none',
+                  backgroundColor: '#fff',
+                  boxShadow: '2px 0 5px rgba(0,0,0,0.05)'
+               },
             }}
-            open
+            open // Kalıcı drawer her zaman açık
+            className="sidebar-drawer"
           >
-            {drawer}
+            {drawerContent}
           </Drawer>
         </Box>
 
@@ -410,27 +231,175 @@ window.location.href = '/login';
           component="main"
           sx={{
             flexGrow: 1,
-            p: 3, // İç boşluk
-            width: { md: `calc(100% - ${drawerWidth}px)` },
-            mt: '64px', // AppBar yüksekliği kadar boşluk
-            backgroundColor: 'background.default', // Açık gri arka plan
-            minHeight: 'calc(100vh - 64px)', // Footer yoksa tüm yüksekliği kapla
-            transition: 'margin 0.3s ease-out, width 0.3s ease-out', // İçerik alanı geçişi
+            p: { xs: 2, sm: 3 },
+            width: { md: `calc(100% - ${drawerWidth}px)` }, // Bu doğru
+            // === DEĞİŞİKLİK 3: AppBar altında başlaması için Toolbar eklemek ===
+            // Ana içeriğin AppBar'ın altında başlamasını sağlamak için en üste bir Toolbar eklenir.
+            // mt: '64px' yerine bu daha dinamik bir yöntemdir.
+            backgroundColor: theme.palette.background.default,
+            minHeight: '100vh' // Tam yükseklik için minHeight kullanmak daha iyi
           }}
-          className="main-content"
         >
-          {/* Seçilen içeriği göster */}
-          <div className="content-transition">
-             {renderContent()}
-          </div>
+          {/* === AppBar boşluğu için Toolbar === */}
+          <Toolbar />
+          {/* === İçeriğiniz buradan başlıyor === */}
+          <Typography variant="h5" gutterBottom sx={{ mb: 3, mt:3 }}>
+            Hoş Geldiniz, {yöneticiAdi}!
+          </Typography>
 
-           {/* Alt Bölüm (Footer) - Opsiyonel */}
-           <Box component="footer" sx={{ mt: 4, py: 2, textAlign: 'center', color: 'text.secondary', fontSize: '0.8rem' }}>
-                <Typography variant="body2">© 2025 Okul Yönetim Sistemi | Kullanım Şartları | Destek</Typography>
-           </Box>
+          {/* --- Grid ve Kartlar (Değişiklik Yok) --- */}
+          <Grid container spacing={3}>
+            {/* KPI Kartları */}
+            <Grid item xs={12} sm={6} md={3}>
+              <Card className="hover-effect-card dashboard-summary-card">
+                <CardContent>
+                  <PeopleIcon color="primary" sx={{ fontSize: 40, mb: 1 }}/>
+                  <Typography variant="h6">{kpiData.ogrenciSayisi}</Typography>
+                  <Typography variant="body2" color="text.secondary">Aktif Öğrenci</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            {/* Diğer KPI kartları... */}
+             <Grid item xs={12} sm={6} md={3}>
+               <Card className="hover-effect-card dashboard-summary-card">
+                <CardContent>
+                  <PersonIcon color="secondary" sx={{ fontSize: 40, mb: 1 }}/>
+                  <Typography variant="h6">{kpiData.ogretmenSayisi}</Typography>
+                  <Typography variant="body2" color="text.secondary">Aktif Öğretmen</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+             <Grid item xs={12} sm={6} md={3}>
+               <Card className="hover-effect-card dashboard-summary-card">
+                <CardContent>
+                  <SchoolIcon sx={{ fontSize: 40, mb: 1, color:'#6f42c1' }}/>
+                  <Typography variant="h6">{kpiData.sinifSayisi}</Typography>
+                  <Typography variant="body2" color="text.secondary">Toplam Şube</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+             <Grid item xs={12} sm={6} md={3}>
+               <Card className="hover-effect-card dashboard-summary-card">
+                <CardContent>
+                   <CheckCircleOutlineIcon color="warning" sx={{ fontSize: 40, mb: 1 }}/>
+                  <Typography variant="h6">%{kpiData.devamsizlikOrani}</Typography>
+                  <Typography variant="body2" color="text.secondary">Günlük Devamsızlık</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+
+
+            {/* Hızlı Eylem Butonları */}
+            <Grid item xs={12}>
+              <Paper sx={{ p: 2, display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                 <Button variant="contained" startIcon={<AddIcon />} className="quick-action-button" href="/ogrenciler/ekle">
+                  Yeni Öğrenci
+                </Button>
+                 <Button variant="contained" color="secondary" startIcon={<AddIcon />} className="quick-action-button" href="/ogretmenler/ekle">
+                  Yeni Öğretmen
+                </Button>
+                 <Button variant="outlined" startIcon={<CampaignIcon />} className="quick-action-button" href="/duyurular/yeni">
+                  Duyuru Gönder
+                </Button>
+                 <Button variant="outlined" color="secondary" startIcon={<AssessmentIcon />} className="quick-action-button" href="/raporlar">
+                  Raporları Görüntüle
+                </Button>
+              </Paper>
+            </Grid>
+
+             {/* Bildirimler & Duyurular */}
+             <Grid item xs={12} md={6}>
+                 <Card sx={{ minHeight: 300 }}>
+                    <CardContent>
+                        <Typography variant="h6" gutterBottom>Bildirimler & Uyarılar</Typography>
+                        <List dense>
+                            {bildirimler.map((item, index) => (
+                                <Fade in={true} timeout={500 + index * 100} key={item.id}>
+                                    <ListItem
+                                        disablePadding
+                                        className={`fade-in-item ${getAlertClass(item.status)}`}
+                                        sx={{ mb: 1, borderRadius: 1, p: 1 }}
+                                    >
+                                        <ListItemIcon sx={{ minWidth: 30 }}>
+                                            {getIconForNotification(item.status)}
+                                        </ListItemIcon>
+                                        <ListItemText
+                                            primary={item.text}
+                                            primaryTypographyProps={{ variant: 'body2' }}
+                                        />
+                                        <Button size="small" variant="text" sx={{ ml: 1 }}>İncele</Button>
+                                    </ListItem>
+                                </Fade>
+                            ))}
+                             {bildirimler.length === 0 && <Typography variant="body2" color="text.secondary">Yeni bildirim yok.</Typography>}
+                        </List>
+                    </CardContent>
+                </Card>
+             </Grid>
+             <Grid item xs={12} md={6}>
+                <Card sx={{ minHeight: 300 }}>
+                    <CardContent>
+                        <Typography variant="h6" gutterBottom>Son Duyurular</Typography>
+                         <List dense>
+                            {duyurular.map((duyuru) => (
+                                <ListItem key={duyuru.id} disablePadding sx={{ mb: 1 }}>
+                                     <ListItemButton component="a" href={`/duyurular/${duyuru.id}`}>
+                                         <ListItemIcon sx={{ minWidth: 30 }}><CampaignIcon fontSize="small" color="action"/></ListItemIcon>
+                                        <ListItemText
+                                            primary={duyuru.title}
+                                            secondary={`Tarih: ${duyuru.date}`}
+                                            primaryTypographyProps={{ variant: 'body2', fontWeight: 500 }}
+                                            secondaryTypographyProps={{ variant: 'caption' }}
+                                            />
+                                     </ListItemButton>
+                                </ListItem>
+                            ))}
+                            {duyurular.length === 0 && <Typography variant="body2" color="text.secondary">Gösterilecek duyuru yok.</Typography>}
+                        </List>
+                        <Button size="small" sx={{ mt: 1 }} href="/duyurular">Tüm Duyurular</Button>
+                    </CardContent>
+                </Card>
+             </Grid>
+
+             {/* Etkinlikler & Grafik */}
+             <Grid item xs={12} md={6}>
+                <Card sx={{ minHeight: 300 }}>
+                    <CardContent>
+                        <Typography variant="h6" gutterBottom>Yaklaşan Etkinlikler</Typography>
+                         <List dense>
+                            {etkinlikler.map((etkinlik) => (
+                                <ListItem key={etkinlik.id} disablePadding sx={{ mb: 1 }}>
+                                    <ListItemIcon sx={{ minWidth: 30 }}><EventNoteIcon fontSize="small" color="action"/></ListItemIcon>
+                                    <ListItemText
+                                        primary={etkinlik.title}
+                                        secondary={`Tarih: ${etkinlik.date}`}
+                                        primaryTypographyProps={{ variant: 'body2' }}
+                                        secondaryTypographyProps={{ variant: 'caption' }}
+                                    />
+                                </ListItem>
+                            ))}
+                            {etkinlikler.length === 0 && <Typography variant="body2" color="text.secondary">Yaklaşan etkinlik bulunmamaktadır.</Typography>}
+                        </List>
+                    </CardContent>
+                </Card>
+             </Grid>
+            <Grid item xs={12} md={6}>
+                 <Card sx={{ minHeight: 300 }}>
+                    <CardContent>
+                       <Typography variant="h6" gutterBottom>Devamsızlık Trendi (Haftalık)</Typography>
+                       <Box className="chart-container" sx={{ backgroundColor: '#fff', borderRadius: 1}}>
+                            <BarChartIcon sx={{ fontSize: 60, color: 'lightgray' }}/>
+                           <Typography color="text.secondary" sx={{ ml: 1 }}>Grafik Alanı</Typography>
+                       </Box>
+                    </CardContent>
+                </Card>
+            </Grid>
+
+          </Grid>
         </Box>
       </Box>
-      </ThemeProvider>
+    </ThemeProvider>
   );
 }
-export default YonetimAnasayfa;
+
+export default YoneticiAnasayfa;
