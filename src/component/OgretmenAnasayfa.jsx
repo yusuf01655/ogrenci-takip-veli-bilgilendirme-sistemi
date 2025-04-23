@@ -1,27 +1,112 @@
-// VeliAnasayfa.js
-import React from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './style/VeliAnasayfa.css';
-import { 
-  Navbar, Nav, Container, Row, Col, 
-  Card, ListGroup, Table, Button, Badge 
-} from 'react-bootstrap';
-import { 
-  Bell, Calendar, Book, Clock, 
-  Clipboard, BarChart, Mail 
-} from 'react-feather';
+import React, { useState } from "react";
+import {
+  Box,
+  AppBar,
+  Toolbar,
+  Typography,
+  IconButton,
+  Avatar,
+  Menu,
+  MenuItem,
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Button,
+  Paper,
+  Fade,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Badge,
+  useMediaQuery,
+  Divider,
+} from "@mui/material";
+import {
+  Dashboard as DashboardIcon,
+  People as PeopleIcon,
+  Mail as MailIcon,
+  CalendarMonth as CalendarIcon,
+  MenuBook as BookIcon,
+  Assessment as ReportIcon,
+  Logout as LogoutIcon,
+  Notifications as NotificationsIcon,
+  School as SchoolIcon,
+  Event as EventIcon,
+  Assignment as AssignmentIcon,
+  Info as InfoIcon,
+} from "@mui/icons-material";
+import "./style/OgretmenAnasayfa.css";
 
-const OgretmenAnasayfa = () => {
-  const todaySchedule = [
-    { time: '09:00', lesson: 'Matematik', teacher: 'Ahmet Yılmaz' },
-    { time: '10:30', lesson: 'Fen Bilgisi', teacher: 'Ayşe Demir' },
+
+const menuItems = [
+  { key: "dashboard", label: "Dashboard", icon: <DashboardIcon /> },
+  { key: "students", label: "Öğrenci İzleme", icon: <PeopleIcon /> },
+  { key: "communication", label: "İletişim", icon: <MailIcon /> },
+  { key: "calendar", label: "Takvim", icon: <CalendarIcon /> },
+  { key: "materials", label: "Eğitim Materyalleri", icon: <BookIcon /> },
+  { key: "reports", label: "Raporlar", icon: <ReportIcon /> },
+];
+
+const notifications = [
+  { id: 1, text: "Bugün 2 öğrenciniz devamsız.", type: "info" },
+  { id: 2, text: "Yarın Matematik sınavı var.", type: "warning" },
+];
+
+const students = [
+  { id: 1, name: "Ahmet Yılmaz", grade: 85, absence: 2, behavior: "İyi" },
+  { id: 2, name: "Ayşe Demir", grade: 92, absence: 0, behavior: "Çok İyi" },
+  { id: 3, name: "Mehmet Kaya", grade: 74, absence: 1, behavior: "Orta" },
+];
+
+export default function OgretmenAnasayfa() {
+  const [selectedMenu, setSelectedMenu] = useState("dashboard");
+  const [profileAnchor, setProfileAnchor] = useState(null);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const isMobile = useMediaQuery("(max-width:900px)");
+
+  // --- Dashboard Widget'ları ---
+  const dashboardWidgets = [
+    {
+      icon: <PeopleIcon className="widget-icon" />,
+      title: "Toplam Öğrenci",
+      value: students.length,
+      color: "blue",
+    },
+    {
+      icon: <AssignmentIcon className="widget-icon" />,
+      title: "Yaklaşan Ödev",
+      value: "2",
+      color: "orange",
+    },
+    {
+      icon: <EventIcon className="widget-icon" />,
+      title: "Bugünkü Devamsızlık",
+      value: "2",
+      color: "green",
+    },
   ];
 
-  const assignments = [
-    { title: 'Matematik Problemleri', status: 'Tamamlandı', color: 'success' },
-    { title: 'Deney Raporu', status: 'Bekliyor', color: 'warning' },
-  ];
-  
+  // --- Menü Tıklama ---
+  const handleMenuClick = (key) => setSelectedMenu(key);
+
+  // --- Profil Menüsü ---
+  const handleProfileMenu = (event) => setProfileAnchor(event.currentTarget);
+  const handleProfileClose = () => setProfileAnchor(null);
+  const handleProfileCloseLogout = () => {
+    setProfileAnchor(null);
+    handleLogout();
+  }
+  // --- Bildirim Modalı ---
+  const handleNotifOpen = () => setNotifOpen(true);
+  const handleNotifClose = () => setNotifOpen(false);
+
+  // --- Modal Örneği (Mesaj Gönder) ---
+  const handleModalOpen = () => setModalOpen(true);
+  const handleModalClose = () => setModalOpen(false);
   const handleLogout = () => {
     // JWT'yi temizle
     localStorage.removeItem('authToken'); // ya da sessionStorage
@@ -32,142 +117,380 @@ const OgretmenAnasayfa = () => {
     
   }
 
-  return (
-    <>
-      <Navbar expand="lg" className="px-4">
-        <Navbar.Brand href="#home" className="text-primary fw-bold">
-          Öğretmen Portalı
-        </Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="ms-auto">
-            <Nav.Link href="#home" className="mx-3">Anasayfa</Nav.Link>
-            <Nav.Link href="#messages" className="mx-3">Mesajlar</Nav.Link>
-            <Nav.Link href="#profile" className="mx-3">Profil</Nav.Link>
-            <Nav.Link href="#profile" className="mx-3" onClick={handleLogout}>Çıkış yap</Nav.Link>
-          </Nav>
-        </Navbar.Collapse>
-      </Navbar>
-
-      <Container fluid>
-        <Row>
-          {/* Sol Panel */}
-          <Col md={3} className="sidebar">
-            <div className="d-flex align-items-center mb-4">
-              <div className="me-3">
-                <h5>Ahmet Can</h5>
-                <p className="text-muted mb-0">9-A Sınıfı</p>
-              </div>
-            </div>
-
-            <Card className="mb-3">
-              <Card.Body>
-                <h6 className="mb-3"><BarChart size={20} className="me-2" />Genel Durum</h6>
-                <div className="d-flex justify-content-between mb-2">
-                  <span>Not Ortalaması</span>
-                  <Badge bg="primary">84.5</Badge>
-                </div>
-                <div className="d-flex justify-content-between">
-                  <span>Devamsızlık</span>
-                  <Badge bg="warning">2 Gün</Badge>
-                </div>
-              </Card.Body>
-            </Card>
-
-            <ListGroup>
-              <ListGroup.Item className="d-flex align-items-center">
-                <Calendar size={18} className="me-2 text-primary" />
-                Etkinlik Takvimi
-              </ListGroup.Item>
-              <ListGroup.Item className="d-flex align-items-center">
-                <Mail size={18} className="me-2 text-primary" />
-                Mesaj Kutusu
-              </ListGroup.Item>
-            </ListGroup>
-          </Col>
-
-          {/* Ana İçerik */}
-          <Col md={5} className="main-content">
-            <h4 className="mb-4">Hoş Geldiniz, Sayın Öğretmen</h4>
-            
-            <Card className="mb-4">
-              <Card.Body>
-                <h5 className="mb-3"><Clock className="me-2" />Günlük Ders Programı</h5>
-                <Table hover>
+  // --- Ana İçerik ---
+  const renderContent = () => {
+    switch (selectedMenu) {
+      case "dashboard":
+        return (
+          <Fade in>
+            <Box className="fade-in">
+              <Box className="dashboard-widgets">
+                {dashboardWidgets.map((w, i) => (
+                  <Paper
+                    key={i}
+                    className="widget-card"
+                    elevation={0}
+                    onClick={w.title === "Yaklaşan Ödev" ? handleModalOpen : undefined}
+                    style={{ cursor: w.title === "Yaklaşan Ödev" ? "pointer" : "default" }}
+                  >
+                    {w.icon}
+                    <Box className="widget-content">
+                      <Typography className="widget-title">{w.title}</Typography>
+                      <Typography
+                        className={`widget-value ${
+                          w.color === "green"
+                            ? "green"
+                            : w.color === "orange"
+                            ? "orange"
+                            : ""
+                        }`}
+                      >
+                        {w.value}
+                      </Typography>
+                    </Box>
+                  </Paper>
+                ))}
+              </Box>
+              <Paper elevation={0} sx={{ p: 2, mb: 2 }}>
+                <Typography variant="h6" sx={{ mb: 1 }}>
+                  Anlık Bildirimler
+                </Typography>
+                {notifications.map((n) => (
+                  <Box
+                    key={n.id}
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      mb: 1,
+                      color: n.type === "warning" ? "#FFA500" : "#007BFF",
+                    }}
+                  >
+                    <InfoIcon fontSize="small" />
+                    <Typography>{n.text}</Typography>
+                  </Box>
+                ))}
+              </Paper>
+            </Box>
+          </Fade>
+        );
+      case "students":
+        return (
+          <Fade in>
+            <Box className="fade-in">
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                Öğrenci Listesi
+              </Typography>
+              <Paper elevation={0} sx={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr style={{ background: "#e3f2fd" }}>
+                      <th style={{ padding: "12px", textAlign: "left" }}>Ad Soyad</th>
+                      <th style={{ padding: "12px", textAlign: "left" }}>Not</th>
+                      <th style={{ padding: "12px", textAlign: "left" }}>Devamsızlık</th>
+                      <th style={{ padding: "12px", textAlign: "left" }}>Davranış</th>
+                    </tr>
+                  </thead>
                   <tbody>
-                    {todaySchedule.map((item, index) => (
-                      <tr key={index}>
-                        <td>{item.time}</td>
-                        <td>{item.lesson}</td>
-                        <td>{item.teacher}</td>
+                    {students.map((s) => (
+                      <tr key={s.id} style={{ cursor: "pointer", transition: "background 0.3s" }}>
+                        <td style={{ padding: "12px" }}>{s.name}</td>
+                        <td style={{ padding: "12px" }}>{s.grade}</td>
+                        <td style={{ padding: "12px" }}>{s.absence}</td>
+                        <td style={{ padding: "12px" }}>{s.behavior}</td>
                       </tr>
                     ))}
                   </tbody>
-                </Table>
-              </Card.Body>
-            </Card>
+                </table>
+              </Paper>
+            </Box>
+          </Fade>
+        );
+      case "communication":
+        return (
+          <Fade in>
+            <Box className="fade-in">
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                Veliye Mesaj Gönder
+              </Typography>
+              <Paper elevation={0} sx={{ p: 2, maxWidth: 400 }}>
+                <form>
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="body2" sx={{ mb: 0.5 }}>
+                      Veli Adı
+                    </Typography>
+                    <input
+                      type="text"
+                      placeholder="Veli adı giriniz"
+                      style={{
+                        width: "100%",
+                        padding: "10px",
+                        borderRadius: "10px",
+                        border: "1px solid #e0e0e0",
+                        fontFamily: "Roboto",
+                        fontSize: "1rem",
+                      }}
+                    />
+                  </Box>
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="body2" sx={{ mb: 0.5 }}>
+                      Mesaj
+                    </Typography>
+                    <textarea
+                      placeholder="Mesajınızı yazınız"
+                      rows={3}
+                      style={{
+                        width: "100%",
+                        padding: "10px",
+                        borderRadius: "10px",
+                        border: "1px solid #e0e0e0",
+                        fontFamily: "Roboto",
+                        fontSize: "1rem",
+                        resize: "vertical",
+                      }}
+                    />
+                  </Box>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleModalOpen}
+                    sx={{ width: "100%" }}
+                  >
+                    Gönder
+                  </Button>
+                </form>
+              </Paper>
+            </Box>
+          </Fade>
+        );
+      case "calendar":
+        return (
+          <Fade in>
+            <Box className="fade-in">
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                Takvim
+              </Typography>
+              <Paper elevation={0} sx={{ p: 2 }}>
+                <Typography>
+                  <b>Yarın:</b> Matematik Sınavı <br />
+                  <b>15 Haziran:</b> Veli Toplantısı <br />
+                  <b>20 Haziran:</b> Yıl Sonu Etkinliği
+                </Typography>
+              </Paper>
+            </Box>
+          </Fade>
+        );
+      case "materials":
+        return (
+          <Fade in>
+            <Box className="fade-in">
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                Ders Planları & Materyaller
+              </Typography>
+              <Paper elevation={0} sx={{ p: 2 }}>
+                <Typography>
+                  <b>Matematik:</b> 5. Ünite Sunumu <br />
+                  <b>Fen Bilimleri:</b> Deney Videosu <br />
+                  <b>Türkçe:</b> Okuma Alıştırmaları PDF
+                </Typography>
+                <Button
+                  variant="outlined"
+                  color="success"
+                  sx={{ mt: 2 }}
+                  onClick={handleModalOpen}
+                >
+                  Yeni Materyal Ekle
+                </Button>
+              </Paper>
+            </Box>
+          </Fade>
+        );
+      case "reports":
+        return (
+          <Fade in>
+            <Box className="fade-in">
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                Performans Raporları
+              </Typography>
+              <Paper elevation={0} sx={{ p: 2 }}>
+                <Typography>
+                  Öğrenci performans raporlarını oluşturup PDF olarak indirebilirsiniz.
+                </Typography>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  sx={{ mt: 2 }}
+                  onClick={handleModalOpen}
+                >
+                  Rapor Oluştur
+                </Button>
+              </Paper>
+            </Box>
+          </Fade>
+        );
+      default:
+        return null;
+    }
+  };
 
-            <Row>
-              <Col md={6}>
-                <Card className="mb-4">
-                  <Card.Body>
-                    <h5 className="mb-3"><Book className="me-2" />Ödevler</h5>
-                    {assignments.map((item, index) => (
-                      <div key={index} className="d-flex justify-content-between mb-2">
-                        <span>{item.title}</span>
-                        <Badge bg={item.color}>{item.status}</Badge>
-                      </div>
-                    ))}
-                  </Card.Body>
-                </Card>
-              </Col>
-              
-              <Col md={6}>
-                <Card className="mb-4">
-                  <Card.Body>
-                    <h5 className="mb-3"><Clipboard className="me-2" />Son Sınav Sonuçları</h5>
-                    <div className="d-flex justify-content-between mb-2">
-                      <span>Matematik</span>
-                      <Badge bg="primary">92</Badge>
-                    </div>
-                    <div className="d-flex justify-content-between">
-                      <span>Fen Bilgisi</span>
-                      <Badge bg="primary">85</Badge>
-                    </div>
-                  </Card.Body>
-                </Card>
-              </Col>
-            </Row>
-          </Col>
+  // --- Layout ---
+  return (
+    <Box sx={{ display: "flex", minHeight: "100vh", background: "#F8F9FA" }}>
+      {/* Sidebar */}
+      <Drawer
+        variant={isMobile ? "temporary" : "permanent"}
+        open={!isMobile || selectedMenu}
+        onClose={() => {}}
+        PaperProps={{
+          className: "teacher-sidebar",
+          sx: {
+            width: isMobile ? 60 : 220,
+            boxShadow: isMobile ? 3 : 0,
+            zIndex: 1200,
+          },
+        }}
+        ModalProps={{
+          keepMounted: true,
+        }}
+      >
+        <List>
+          {menuItems.map((item) => (
+            <ListItem
+              button
+              key={item.key}
+              selected={selectedMenu === item.key}
+              onClick={() => handleMenuClick(item.key)}
+              sx={{
+                minHeight: 48,
+                px: isMobile ? 1 : 2,
+                justifyContent: isMobile ? "center" : "flex-start",
+              }}
+            >
+              <ListItemIcon sx={{ minWidth: 0, mr: isMobile ? 0 : 2 }}>
+                {item.icon}
+              </ListItemIcon>
+              {!isMobile && (
+                <ListItemText
+                  primary={item.label}
+                  primaryTypographyProps={{ fontWeight: 500 }}
+                />
+              )}
+            </ListItem>
+          ))}
+        </List>
+      </Drawer>
 
-          {/* Sağ Panel */}
-          <Col md={3} className="notification-panel">
-            <h5 className="mb-3"><Bell className="me-2" />Bildirimler</h5>
-            <ListGroup variant="flush">
-              <ListGroup.Item className="d-flex align-items-center">
-                <div className="me-2 text-warning">•</div>
-                Yeni veli toplantısı duyurusu
-              </ListGroup.Item>
-              <ListGroup.Item className="d-flex align-items-center">
-                <div className="me-2 text-primary">•</div>
-                Matematik ödevi güncellendi
-              </ListGroup.Item>
-            </ListGroup>
+      {/* Main Content */}
+      <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+        {/* Header */}
+        <AppBar
+          position="static"
+          elevation={0}
+          className="teacher-dashboard-header"
+          sx={{
+            background: "#fff",
+            color: "#007BFF",
+            borderBottom: "1px solid #e0e0e0",
+            px: 2,
+          }}
+        >
+          <Toolbar sx={{ minHeight: 64, px: 0 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <SchoolIcon sx={{ fontSize: 36, color: "#007BFF" }} />
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 700,
+                  color: "#007BFF",
+                  letterSpacing: 0.5,
+                  fontFamily: "Roboto",
+                }}
+              >
+                Öğretmen Anasayfası
+              </Typography>
+            </Box>
+            <Box sx={{ flex: 1 }} />
+            <Box className="profile">
+              <IconButton color="primary" onClick={handleNotifOpen}>
+                <Badge badgeContent={notifications.length} color="warning">
+                  <NotificationsIcon />
+                </Badge>
+              </IconButton>
+              <IconButton onClick={handleProfileMenu}>
+                <Avatar sx={{ bgcolor: "#007BFF" }}>Ö</Avatar>
+              </IconButton>
+              <Menu
+                anchorEl={profileAnchor}
+                open={Boolean(profileAnchor)}
+                onClose={handleProfileClose}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                transformOrigin={{ vertical: "top", horizontal: "right" }}
+              >
+                <MenuItem onClick={handleProfileClose}>Profilim</MenuItem>
+                <Divider />
+                <MenuItem onClick={handleProfileCloseLogout}>
+                  <LogoutIcon  fontSize="small" sx={{ mr: 1 }} />
+                  Çıkış Yap
+                </MenuItem>
+              </Menu>
+            </Box>
+          </Toolbar>
+        </AppBar>
 
-            <div className="mt-4">
-              <h5 className="mb-3">Hızlı Erişim</h5>
-              <Button variant="outline-primary" className="w-100 mb-2">
-                Akademik Rapor
-              </Button>
-              <Button variant="outline-success" className="w-100 mb-2">
-                Davranış Raporu
-              </Button>
-            </div>
-          </Col>
-        </Row>
-      </Container>
-    </>
+        {/* Main Content Area */}
+        <Box className="teacher-main-content" sx={{ flex: 1 }}>
+          {renderContent()}
+        </Box>
+
+        {/* Footer */}
+        <Box className="teacher-footer">
+          © 2024 Okul Yönetim Sistemi | <a href="#">Destek</a> |{" "}
+          <a href="#">Gizlilik Politikası</a>
+        </Box>
+      </Box>
+
+      {/* Bildirim Modal */}
+      <Dialog open={notifOpen} onClose={handleNotifClose} maxWidth="xs" fullWidth>
+        <DialogTitle>
+          <NotificationsIcon sx={{ color: "#007BFF", mr: 1 }} />
+          Bildirimler
+        </DialogTitle>
+        <DialogContent dividers>
+          {notifications.map((n) => (
+            <Box
+              key={n.id}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                mb: 1,
+                color: n.type === "warning" ? "#FFA500" : "#007BFF",
+              }}
+            >
+              <InfoIcon fontSize="small" />
+              <Typography>{n.text}</Typography>
+            </Box>
+          ))}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleNotifClose} color="primary">
+            Kapat
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Genel Modal (Örnek: Mesaj Gönder, Rapor Oluştur) */}
+      <Dialog open={modalOpen} onClose={handleModalClose} maxWidth="xs" fullWidth>
+        <DialogTitle>İşlem Başarılı</DialogTitle>
+        <DialogContent>
+          <Typography>İşleminiz başarıyla gerçekleştirildi.</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleModalClose} color="primary">
+            Tamam
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
-};
-
-export default OgretmenAnasayfa;
+}
