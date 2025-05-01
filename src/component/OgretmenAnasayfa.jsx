@@ -22,8 +22,11 @@ import {
   DialogActions,
   Badge,
   useMediaQuery,
+  styled,
   Divider,
+  
 } from "@mui/material";
+import { useTheme } from '@mui/material/styles'; // Eğer Material UI teması kullanıyorsan
 import {
   Dashboard as DashboardIcon,
   People as PeopleIcon,
@@ -39,7 +42,34 @@ import {
   Info as InfoIcon,
 } from "@mui/icons-material";
 import "./style/OgretmenAnasayfa.css";
+import MenuIcon from '@mui/icons-material/Menu';
+import ChevronLeft from '@mui/icons-material/ChevronLeft';
+import ChevronRight from '@mui/icons-material/ChevronRight';
+const drawerWidth = 240;
+const collapsedWidth = 72;
 
+
+const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
+  ({ theme, open, sidebarCollapsed }) => ({
+    flexGrow: 1,
+    padding: theme.spacing(3),
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    marginLeft: `-${drawerWidth}px`,
+    ...(open && {
+      transition: theme.transitions.create('margin', {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      marginLeft: 0,
+    }),
+    ...(sidebarCollapsed && {
+      marginLeft: `-${collapsedWidth}px`,
+    }),
+  }),
+);
 
 const menuItems = [
   { key: "dashboard", label: "Dashboard", icon: <DashboardIcon /> },
@@ -62,12 +92,14 @@ const students = [
 ];
 
 export default function OgretmenAnasayfa() {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [selectedMenu, setSelectedMenu] = useState("dashboard");
   const [profileAnchor, setProfileAnchor] = useState(null);
   const [notifOpen, setNotifOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const isMobile = useMediaQuery("(max-width:900px)");
-
+  const theme = useTheme();
   // --- Dashboard Widget'ları ---
   const dashboardWidgets = [
     {
@@ -332,56 +364,114 @@ export default function OgretmenAnasayfa() {
         return null;
     }
   };
-
+  
   // --- Layout ---
   return (
     <Box sx={{ display: "flex", minHeight: "100vh", background: "#F8F9FA" }}>
       {/* Sidebar */}
       <Drawer
-        variant={isMobile ? "temporary" : "permanent"}
-        open={!isMobile || selectedMenu}
-        onClose={() => {}}
-        PaperProps={{
-          className: "teacher-sidebar",
-          sx: {
-            width: isMobile ? 60 : 220,
-            boxShadow: isMobile ? 3 : 0,
-            zIndex: 1200,
-          },
-        }}
-        ModalProps={{
-          keepMounted: true,
-        }}
-      >
+    variant={isMobile ? "temporary" : "permanent"}
+    open={isMobile ? drawerOpen : true}
+    onClose={() => setDrawerOpen(false)}
+    PaperProps={{
+      className: "teacher-sidebar",
+      sx: {
+        width: isMobile ? drawerWidth : sidebarCollapsed ? collapsedWidth : drawerWidth,
+        transition: theme.transitions.create('width',{
+          easing: theme.transitions.easing.sharp,
+          duration: theme.transitions.duration.enteringScreen,
+        }),
+        boxShadow: isMobile ? 3 : 0,
+        zIndex: 1200,
+        overflowX: "hidden",
+        '& .MuiListItemIcon-root':{
+          minWidth: 'auto',
+          justifyContent: 'center',
+        },
+        '& .MuiListItemText-root':{
+          opacity: sidebarCollapsed && !isMobile ? 0 : 1,
+          transition: theme.transitions.create('opacity',{
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+          }),
+        },
+      },
+    }}
+    ModalProps={{
+      keepMounted: true,
+    }}
+  >
         <List>
-          {menuItems.map((item) => (
-            <ListItem
-              button
-              key={item.key}
-              selected={selectedMenu === item.key}
-              onClick={() => handleMenuClick(item.key)}
-              sx={{
-                minHeight: 48,
-                px: isMobile ? 1 : 2,
-                justifyContent: isMobile ? "center" : "flex-start",
+      {/* Collapse/Expand Butonu */}
+      {!isMobile && (
+        <ListItem
+          button
+          /* onClick={() => setSidebarCollapsed(!sidebarCollapsed)} */
+          sx={{
+            justifyContent: "center",
+            py: 2,
+            "&:hover": { background: "transparent" },
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 0 }}>
+            {sidebarCollapsed ? (
+               <SchoolIcon sx={{ fontSize: 36, color: "#007BFF" }} />
+            ) : (
+              <SchoolIcon sx={{ fontSize: 36, color: "#007BFF" }} />
+            )}
+          </ListItemIcon>
+        </ListItem>
+      )}
+
+      {/* Menü Öğeleri */}
+      {menuItems.map((item) => (
+        <ListItem
+          button
+          key={item.key}
+          selected={selectedMenu === item.key}
+          onClick={() => {
+            handleMenuClick(item.key);
+            if (isMobile) setDrawerOpen(false);
+          }}
+          sx={{
+            minHeight: 48,
+            px: 2.5,
+            justifyContent: sidebarCollapsed && !isMobile ? "center" : "flex-start",
+          }}
+        >
+          <ListItemIcon
+            sx={{
+              minWidth: 0,
+              mr: sidebarCollapsed && !isMobile ? 0 : 2,
+              justifyContent: "center",
+            }}
+          >
+            {item.icon}
+          </ListItemIcon>
+          
+            <ListItemText
+              primary={item.label}
+              primaryTypographyProps={{
+                fontWeight: 500,
+                fontSize: "0.875rem",
               }}
-            >
-              <ListItemIcon sx={{ minWidth: 0, mr: isMobile ? 0 : 2 }}>
-                {item.icon}
-              </ListItemIcon>
-              {!isMobile && (
-                <ListItemText
-                  primary={item.label}
-                  primaryTypographyProps={{ fontWeight: 500 }}
-                />
-              )}
-            </ListItem>
-          ))}
-        </List>
+              sx = {{
+                display: isMobile ? 'block' : (sidebarCollapsed ? 'none' : 'block'),
+              }}
+            />
+          
+        </ListItem>
+      ))}
+    </List>
       </Drawer>
 
       {/* Main Content */}
-      <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+      <Box component = "main" sx={{ flexGrow: 1, p:3, width:`calc(100% - ${sidebarCollapsed && !isMobile ? collapsedWidth : drawerWidth}px)`,transition: theme.transitions.create(['width', 'margin'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+          }),...(!isMobile && {
+            marginLeft: `${sidebarCollapsed ? collapsedWidth : drawerWidth}px`,
+          }), }}>
         {/* Header */}
         <AppBar
           position="static"
@@ -396,6 +486,16 @@ export default function OgretmenAnasayfa() {
         >
           <Toolbar sx={{ minHeight: 64, px: 0 }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            {isMobile && (
+  <IconButton
+    edge="start"
+    color="inherit"
+    onClick={() => setDrawerOpen(!drawerOpen)}
+    sx={{ mr: 2 }}
+  >
+    <MenuIcon />
+  </IconButton>
+)}
               <SchoolIcon sx={{ fontSize: 36, color: "#007BFF" }} />
               <Typography
                 variant="h6"
@@ -438,7 +538,7 @@ export default function OgretmenAnasayfa() {
         </AppBar>
 
         {/* Main Content Area */}
-        <Box className="teacher-main-content" sx={{ flex: 1 }}>
+        <Box className="teacher-main-content" sx={{ flex: 1, mt:2 }}>
           {renderContent()}
         </Box>
 

@@ -1,174 +1,189 @@
-/* ogretmenanasayfa.css */
-
 body {
-    background-color: #F8F9FA;
-    font-family: 'Roboto', sans-serif;
-  }
-  
-  .teacher-dashboard-header {
-    background: #fff;
-    border-bottom: 1px solid #e0e0e0;
-    padding: 0.5rem 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  
-  .teacher-dashboard-header .logo {
-    height: 40px;
-  }
-  
-  .teacher-dashboard-header .profile {
-    display: flex;
-    align-items: center;
+  background-color: #F8F9FA;
+  font-family: 'Roboto', sans-serif;
+}
+
+.teacher-dashboard-header {
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 0.5rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.teacher-dashboard-header .logo {
+  height: 40px;
+}
+
+.teacher-dashboard-header .profile {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.teacher-sidebar {
+  background: #fff;
+  border-right: 1px solid #e0e0e0;
+  min-width: 220px;
+  padding: 1.5rem 0.5rem;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  transition: box-shadow 0.3s;
+}
+
+.teacher-sidebar .MuiListItem-root {
+  border-radius: 12px;
+  margin-bottom: 0.5rem;
+  transition: background 0.3s;
+}
+
+.teacher-sidebar .MuiListItem-root:hover,
+.teacher-sidebar .Mui-selected {
+  background: #e3f2fd;
+}
+
+.teacher-main-content {
+  padding: 2rem 2rem 1rem 2rem;
+  min-height: 100vh;
+  background: #F8F9FA;
+  position: relative;
+z-index: 1;
+}
+
+.dashboard-widgets {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 900px) {
+  .dashboard-widgets {
+    flex-direction: column;
     gap: 1rem;
   }
-  
   .teacher-sidebar {
-    background: #fff;
-    border-right: 1px solid #e0e0e0;
-    min-width: 220px;
-    padding: 1.5rem 0.5rem;
-    height: 100vh;
-    position: sticky;
-    top: 0;
-    transition: box-shadow 0.3s;
+    min-width: 60px;
+    padding: 0.5rem 0.2rem;
   }
-  
-  .teacher-sidebar .MuiListItem-root {
-    border-radius: 12px;
-    margin-bottom: 0.5rem;
-    transition: background 0.3s;
+  .MuiDrawer-paper {
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1) !important;
   }
-  
-  .teacher-sidebar .MuiListItem-root:hover,
-  .teacher-sidebar .Mui-selected {
-    background: #e3f2fd;
-  }
-  
-  .teacher-main-content {
-    padding: 2rem 2rem 1rem 2rem;
-    min-height: 100vh;
-    background: #F8F9FA;
-  }
-  
-  .dashboard-widgets {
-    display: flex;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-    margin-bottom: 2rem;
-  }
-  
-  @media (max-width: 900px) {
-    .dashboard-widgets {
-      flex-direction: column;
-      gap: 1rem;
-    }
-    .teacher-sidebar {
-      min-width: 60px;
-      padding: 0.5rem 0.2rem;
-    }
-  }
-  
-  .widget-card {
-    flex: 1 1 220px;
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    padding: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 1.2rem;
-    transition: box-shadow 0.3s, transform 0.3s;
-    cursor: pointer;
-  }
-  
-  .widget-card:hover {
-    box-shadow: 0 4px 16px rgba(0,123,255,0.10);
-    transform: translateY(-2px) scale(1.02);
-  }
-  
-  .widget-icon {
-    font-size: 2.5rem;
-    color: #007BFF;
-    background: #e3f2fd;
-    border-radius: 50%;
-    padding: 0.5rem;
-  }
-  
-  .widget-content {
-    flex: 1;
-  }
-  
-  .widget-title {
-    font-size: 1.1rem;
-    color: #333;
-    font-weight: 500;
-  }
-  
-  .widget-value {
-    font-size: 1.7rem;
-    font-weight: bold;
-    color: #007BFF;
-  }
-  
-  .widget-value.green {
-    color: #28A745;
-  }
-  
-  .widget-value.orange {
-    color: #FFA500;
-  }
-  
-  .teacher-footer {
-    background: #fff;
-    border-top: 1px solid #e0e0e0;
-    padding: 1rem 2rem;
-    text-align: center;
-    font-size: 0.95rem;
-    color: #888;
-    margin-top: 2rem;
-  }
-  
-  .fade-in {
-    animation: fadeIn 0.4s ease;
-  }
-  
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(16px);}
-    to { opacity: 1; transform: translateY(0);}
-  }
-  
-  .MuiButton-root {
-    border-radius: 16px !important;
-    text-transform: none !important;
-    font-weight: 500;
-    transition: background 0.3s, color 0.3s;
-  }
-  
-  .MuiButton-root:hover {
-    background-color: #007BFF22 !important;
-  }
-  
-  .MuiTableRow-root:hover {
-    background: #e3f2fd !important;
-    transition: background 0.3s;
-  }
-  
-  .MuiPaper-root {
-    border-radius: 18px !important;
-  }
-  
-  .MuiDialog-paper {
-    border-radius: 18px !important;
-    animation: fadeIn 0.4s;
-  }
-  
-  ::-webkit-scrollbar {
-    width: 8px;
-    background: #F8F9FA;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: #e0e0e0;
-    border-radius: 8px;
-  }
+}
+
+.widget-card {
+  flex: 1 1 220px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  transition: box-shadow 0.3s, transform 0.3s;
+  cursor: pointer;
+}
+
+.widget-card:hover {
+  box-shadow: 0 4px 16px rgba(0,123,255,0.10);
+  transform: translateY(-2px) scale(1.02);
+}
+
+.widget-icon {
+  font-size: 2.5rem;
+  color: #007BFF;
+  background: #e3f2fd;
+  border-radius: 50%;
+  padding: 0.5rem;
+}
+
+.widget-content {
+  flex: 1;
+}
+
+.widget-title {
+  font-size: 1.1rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.widget-value {
+  font-size: 1.7rem;
+  font-weight: bold;
+  color: #007BFF;
+}
+
+.widget-value.green {
+  color: #28A745;
+}
+
+.widget-value.orange {
+  color: #FFA500;
+}
+
+.teacher-footer {
+  background: #fff;
+  border-top: 1px solid #e0e0e0;
+  padding: 1rem 2rem;
+  text-align: center;
+  font-size: 0.95rem;
+  color: #888;
+  margin-top: 2rem;
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(16px);}
+  to { opacity: 1; transform: translateY(0);}
+}
+
+.MuiButton-root {
+  border-radius: 16px !important;
+  text-transform: none !important;
+  font-weight: 500;
+  transition: background 0.3s, color 0.3s;
+}
+
+.MuiButton-root:hover {
+  background-color: #007BFF22 !important;
+}
+
+.MuiTableRow-root:hover {
+  background: #e3f2fd !important;
+  transition: background 0.3s;
+}
+
+.MuiPaper-root {
+  border-radius: 18px !important;
+}
+
+.MuiDialog-paper {
+  border-radius: 18px !important;
+  animation: fadeIn 0.4s;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  background: #F8F9FA;
+}
+::-webkit-scrollbar-thumb {
+  background: #e0e0e0;
+  border-radius: 8px;
+}
+/* Drawer mobilde açıldığında arkaplan karartması */
+.MuiDrawer-root .MuiBackdrop-root {
+background-color: rgba(0, 0, 0, 0.5) !important;
+}
+.MuiDrawer-paper {
+transition: transform 0.3s ease-in-out !important;
+}
+
+
+
+
+
