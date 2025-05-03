@@ -9,6 +9,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline'; // Temel CSS sıfırlaması ve arka plan rengi için
 import theme from './theme';
 import RegisterPage from './pages/RegisterPage';
+import OgrenciIslemleri from './component/OgrenciIslemleri';
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userType, setUserType] = useState(null);
@@ -82,6 +83,7 @@ function App() {
             <Route path="/dashboard" element={<HomePageComponent />} />
            {/*  <Route path="*" element={<Navigate to="/dashboard" />} /> */}
             <Route path="/register" element={<Navigate to="/dashboard" />} />
+            <Route path="/ogrenciler" element={<OgrenciIslemleri />} />
           </>
         )}
       </Routes>

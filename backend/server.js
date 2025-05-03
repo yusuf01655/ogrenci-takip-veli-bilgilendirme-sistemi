@@ -8,7 +8,7 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const authRoutes = require('./routes/authRoutes');
-
+const ogrenciRoutes = require('./routes/ogrenciRoutes');
 const app = express();
 
 // --- Güvenlik Middleware'leri ---
@@ -39,6 +39,7 @@ const loginLimiter = rateLimit({
 app.use('/login', loginLimiter);
 // Ana Rotalar
 app.use('/api/auth', authRoutes); // /api/auth altındaki tüm istekleri authRoutes'a yönlendir
+app.use('/api/ogrenciler', ogrenciRoutes);
 
 // Basit bir test route'u
 app.get('/', (req, res) => {

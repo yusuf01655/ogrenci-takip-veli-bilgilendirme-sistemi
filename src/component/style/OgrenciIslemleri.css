@@ -1,0 +1,128 @@
+/* ogrenciIslemleri.css */
+
+/* Genel Sayfa Stilleri */
+.ogrenci-islemleri-container {
+    padding: 24px; /* Kenar boşlukları */
+    background-color: #F8F9FA; /* Açık Gri Arka Plan */
+    min-height: calc(100vh - 64px); /* Footer veya Header yüksekliğini çıkarabilirsiniz */
+    font-family: 'Roboto', sans-serif;
+  }
+  
+  /* Kart Stilleri */
+  .ogrenci-kart {
+    transition: box-shadow 0.3s ease-in-out, transform 0.2s ease-in-out;
+    border-radius: 8px !important; /* Material UI override */
+  }
+  
+  .ogrenci-kart:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important; /* Daha belirgin gölge */
+    transform: translateY(-3px); /* Hafif yukarı kalkma efekti */
+  }
+  
+  /* Buton Stilleri */
+  .ogrenci-islemleri-container .MuiButton-root {
+    border-radius: 20px; /* Yuvarlak buton köşeleri */
+    text-transform: none; /* Buton metni normal kalsın */
+    padding: 8px 20px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .ogrenci-islemleri-container .MuiButton-containedPrimary {
+    background-color: #007BFF; /* Ana Mavi Renk */
+    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.3);
+  }
+  .ogrenci-islemleri-container .MuiButton-containedPrimary:hover {
+    background-color: #0056b3; /* Hover Mavi */
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.4);
+  }
+  
+  .ogrenci-islemleri-container .MuiButton-containedSecondary {
+      background-color: #28A745; /* Yeşil Renk */
+      color: white;
+      box-shadow: 0 2px 5px rgba(40, 167, 69, 0.3);
+  }
+  .ogrenci-islemleri-container .MuiButton-containedSecondary:hover {
+      background-color: #1e7e34; /* Hover Yeşil */
+      box-shadow: 0 4px 10px rgba(40, 167, 69, 0.4);
+  }
+  
+  .ogrenci-islemleri-container .MuiIconButton-root {
+      transition: color 0.3s ease, background-color 0.3s ease;
+  }
+  .ogrenci-islemleri-container .MuiIconButton-root:hover {
+      background-color: rgba(0, 0, 0, 0.04); /* Hafif hover arka planı */
+  }
+  
+  /* Tablo Stilleri */
+  .ogrenci-tablosu .MuiTableRow-root:hover {
+    background-color: rgba(0, 123, 255, 0.05) !important; /* Hafif mavi hover */
+    cursor: pointer; /* Satırın tıklanabilir olduğunu belirtir gibi */
+  }
+  
+  .ogrenci-tablosu .MuiTableCell-head {
+    background-color: #e9ecef; /* Tablo başlığı arka planı */
+    font-weight: bold;
+    color: #495057;
+  }
+  
+  /* Dialog (Modal) Geçişleri */
+  .MuiDialog-paper {
+    transition: all 0.4s ease-in-out !important; /* Dialog açılma/kapanma animasyonu */
+  }
+  
+  /* Snackbar (Bildirim) Geçişleri */
+  .MuiSnackbar-root {
+    /* Material UI zaten fade animasyonu sağlar, ancak özelleştirmek isterseniz: */
+     transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out !important; 
+  }
+  
+  /* Yükleniyor Göstergesi */
+  .loading-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 200px; /* Yüklenirken boş alanı doldurur */
+      width: 100%;
+  }
+  
+  /* İkon Renkleri */
+  .edit-icon {
+      color: #007BFF; /* Mavi */
+  }
+  .delete-icon {
+      color: #dc3545; /* Kırmızı */
+  }
+  .add-icon {
+      margin-right: 8px;
+  }
+  
+  /* Responsive Tasarım İyileştirmeleri */
+  @media (max-width: 600px) {
+      .ogrenci-islemleri-container {
+          padding: 16px; /* Mobilde daha az padding */
+      }
+  
+      .ogrenci-kart {
+          margin-bottom: 16px; /* Kartlar arası boşluk */
+      }
+  
+      /* Mobilde tablo yerine kart görünümü daha iyi olabilir,
+         ancak şimdilik tabloyu koruyoruz. Gerekirse gizleyip kartları gösterebiliriz. */
+      .hide-on-mobile {
+          display: none !important;
+      }
+      .show-on-mobile {
+          display: table-cell !important; /* Veya block/flex */
+      }
+  
+      /* Mobilde butonlar tam genişlik olabilir */
+      .full-width-mobile {
+          width: 100%;
+          margin-bottom: 8px;
+      }
+      .add-button-container {
+          text-align: center; /* Butonu ortala */
+      }
+  }
+  
+  
