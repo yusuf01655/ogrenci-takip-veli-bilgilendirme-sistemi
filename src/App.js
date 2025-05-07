@@ -10,6 +10,7 @@ import CssBaseline from '@mui/material/CssBaseline'; // Temel CSS sıfırlaması
 import theme from './theme';
 import RegisterPage from './pages/RegisterPage';
 import OgrenciIslemleri from './component/OgrenciIslemleri';
+import MesajIslemi from './component/MesajIslemi';
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userType, setUserType] = useState(null);
@@ -84,6 +85,7 @@ function App() {
            {/*  <Route path="*" element={<Navigate to="/dashboard" />} /> */}
             <Route path="/register" element={<Navigate to="/dashboard" />} />
             <Route path="/ogrenciler" element={<OgrenciIslemleri />} />
+            <Route path="/mesajlar" element={<MesajIslemi />} />
           </>
         )}
       </Routes>

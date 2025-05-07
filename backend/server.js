@@ -142,9 +142,122 @@ app.post('/login', async (req, res) => {
   }
 });
 
+// Kullanıcı ID'sini kullanıcı adına göre bulan basit bir yardımcı fonksiyon (Simülasyon)
+// Gerçek bir uygulamada Users tablosundan sorgu yapılmalı
+async function findUserIdByUsername(username) {
+  console.log(`Kullanıcı adı ile ID aranıyor: ${username}`);
+  // --- GERÇEK UYGULAMA İÇİN NOT ---
+  // Burada 'Users' tablonuza sorgu yapmanız gerekir.
+  // Örnek sorgu:
+   const [rows] = await dbPool.query('SELECT id FROM user WHERE username = ?', [username]);
+   console.log('rows length: ' + rows.length);
+   console.log('rows: ' + rows);
+   console.log('rows[0]: ' + rows[0]);
+   console.log('rows[0].id: ' + rows[0].id);
+   console.log('JSON.stringify(rows): '+ JSON.stringify(rows));
+   
+   if (rows.length > 0) {
+     return rows[0].id;
+   }
+   return null; // Kullanıcı bulunamazsa
+
+  // --- SİMÜLASYON ---
+  // Bu örnek için basit bir eşleşme yapalım (Gerçek uygulamada bunu kullanmayın!)
+  if (username.toLowerCase() === 'alici1') return 101;
+  if (username.toLowerCase() === 'alici2') return 102;
+  if (username.toLowerCase() === 'principal smith') return 201; // React kodundaki mock data ile eşleşmesi için
+  if (username.toLowerCase() === 'guidance counselor') return 202;
+  if (username.toLowerCase() === 'student support') return 203;
+  return null; // Bulunamazsa null dön
+}
+/**
+ * POST /api/messages/send
+ * Yeni bir mesaj gönderir.
+ * Request Body: { recipient: string (username/email), subject: string, body: string, senderId: number (opsiyonel, normalde auth'dan gelir) }
+ */
+app.post('/api/messages/send', async (req, res) => {
+  const { to, subject, body } = req.body;
+  const recipient = to;
+
+  // --- GERÇEK UYGULAMA İÇİN NOT ---
+  // Gönderen ID'si normalde kimlik doğrulama (authentication) işleminden (örneğin JWT token) alınır.
+  // Bu örnekte, basitlik için frontend'den gönderilebilir veya burada sabit kodlanabilir.
+  // Güvenlik açısından frontend'den alınması önerilmez.
+   // --- JWT Token'ı Header üzerinden alma ve doğrulama ---
+   const authHeader = req.headers.authorization;
+   if (!authHeader) {
+     console.error('Authorization header eksik.');
+     return res.status(401).json({ success: false, message: 'Yetkisiz erişim: Token bulunamadı.' });
+   }
+   
+   // Authorization header formatının "Bearer <token>" olduğunu varsayıyoruz.
+   const token = authHeader.split(' ')[1];
+   let decoded;
+   try {
+     decoded = jwt.verify(token, process.env.JWT_SECRET);
+   } catch (error) {
+     console.error('Geçersiz token:', error);
+     return res.status(401).json({ success: false, message: 'Yetkisiz erişim: Token doğrulanamadı.' });
+   }
+  const senderId = decoded.userId;
+
+  console.log('Mesaj gönderme isteği alındı:', { senderId, recipient, subject });
+  
+
+  // --- Girdi Doğrulama ---
+  if (!recipient || !subject || !body) {
+      console.error('Eksik bilgi:', { recipient, subject, body });
+      return res.status(400).json({ success: false, message: 'Eksik bilgi: Alıcı, konu ve mesaj içeriği zorunludur.' });
+  }
+
+  let connection; // Bağlantıyı try bloğu dışında tanımla
+  try {
+      // Alıcı ID'sini bul (Gerçek uygulamada Users tablosundan sorgulanmalı)
+      const recipientId = await findUserIdByUsername(recipient);
+      console.log('Alıcı ID\'si:', recipientId);
+      if (!recipientId) {
+          console.error(`Alıcı bulunamadı: ${recipient}`);
+          return res.status(404).json({ success: false, message: `Alıcı '${recipient}' bulunamadı.` });
+      }
+
+      // Veritabanı bağlantısı al
+      connection = await dbPool.getConnection();
+      console.log('Veritabanı bağlantısı alındı.');
+
+      // Mesajı veritabanına ekle gonderen_id, alici_id, konu, icerik, 
+      const insertQuery = `
+          INSERT INTO mesaj (gonderen_id, alici_id, konu, icerik)
+          VALUES (?, ?, ?, ?)
+      `;
+      const [result] = await connection.query(insertQuery, [senderId, recipientId, subject, body]);
+
+      console.log('Mesaj başarıyla eklendi. Insert ID:', result.insertId);
+
+      // Başarılı yanıt gönder
+      res.status(201).json({ success: true, message: 'Mesaj başarıyla gönderildi!', messageId: result.insertId });
+
+  } catch (error) {
+      console.error('Mesaj gönderilirken hata oluştu:', error);
+      // Genel bir hata mesajı gönder
+      res.status(500).json({ success: false, message: 'Mesaj gönderilirken bir sunucu hatası oluştu.' });
+  } finally {
+      // Bağlantıyı her zaman serbest bırak (hata olsa bile)
+      if (connection) {
+          connection.release();
+          console.log('Veritabanı bağlantısı serbest bırakıldı.');
+      }
+  }
+});
+
 // Diğer Rotalar (Örnek: Kayıt Ol, Şifremi Unuttum vb. buraya eklenebilir)
 // app.post('/register', ...);
 // app.post('/forgot-password', ...);
+
+//  (Gelen Kutusu, Gönderilenler vb.) ---
+// TODO: Gelen kutusu, gönderilenler, mesaj detayları için endpoint'ler ekleyin.
+// Örnek:
+// app.get('/api/messages/inbox/:userId', async (req, res) => { ... });
+// app.get('/api/messages/sent/:userId', async (req, res) => { ... });
 
 
 // --- Sunucuyu Başlat ---

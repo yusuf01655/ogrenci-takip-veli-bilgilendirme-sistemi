@@ -25,6 +25,7 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import InfoIcon from '@mui/icons-material/Info';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import BarChartIcon from '@mui/icons-material/BarChart'; // Grafik ikonu
+import MessageIcon from '@mui/icons-material/Message';
 import './style/yoneticianasayfa.css';
 // Varsayılan tema veya kendi temanız (import path doğru olmalı)
  import customTheme from '../theme';
@@ -125,6 +126,7 @@ function YoneticiAnasayfa() {
           { text: 'Not İşlemleri', icon: <AssignmentIcon />, path: '/notlar' },
           { text: 'Duyurular', icon: <CampaignIcon />, path: '/duyurular' },
           { text: 'Raporlar', icon: <AssessmentIcon />, path: '/raporlar' },
+          { text: 'Mesaj işlemleri', icon: <MessageIcon />, path: '/mesajlar' },
           { text: 'Sistem Ayarları', icon: <SettingsIcon />, path: '/ayarlar' },
         ].map((item, index) => (
           <ListItem key={item.text} disablePadding>

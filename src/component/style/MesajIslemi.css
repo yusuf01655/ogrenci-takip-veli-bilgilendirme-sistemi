@@ -1,0 +1,93 @@
+/* --- MesajIslemi.css --- */
+
+/* General Styles & Spacing */
+body {
+    background-color: #F8F9FA; /* Light Gray Background */
+    font-family: 'Roboto', sans-serif;
+  }
+  
+  /* Ensure containers have appropriate spacing */
+  .MuiContainer-root {
+    /* Material UI's theme spacing is preferred, but you can override */
+  }
+  
+  /* Message List Item Styling */
+  .message-item {
+    transition: background-color 0.3s ease-in-out; /* Hover effect transition */
+    border-radius: 4px; /* Slightly rounded items */
+    margin-bottom: 4px; /* Add space between items */
+  }
+  
+  .message-item:hover {
+    background-color: #e9ecef; /* Lighter gray on hover */
+  }
+  
+  .message-item.unread {
+    /* Style for unread messages (e.g., bold text) */
+    /* Material UI ListItemText primary/secondary props can handle this often */
+    font-weight: bold; /* Example */
+  }
+  
+  .message-item.selected {
+      background-color: #cfe8fc; /* Light blue for selected item in split view */
+  }
+  
+  
+  /* Animations */
+  
+  /* Fade-in for notifications (Example - apply to notification component) */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .notification-popup { /* Example class for a notification element */
+    animation: fadeIn 0.5s ease-out forwards;
+    /* Add other notification styles: position, padding, background, etc. */
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #28A745; /* Green for success */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    z-index: 1000;
+  }
+  
+  
+  /* Page/View Transition (Example - if using a library like react-transition-group) */
+  /* These classes would be applied by the transition library */
+  .page-enter {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  .page-enter-active {
+    opacity: 1;
+    transform: translateX(0);
+    transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out; /* Adjust timing (0.3-0.5s) */
+  }
+  .page-exit {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .page-exit-active {
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out; /* Adjust timing */
+  }
+  
+  
+  /* Button Hover Effects */
+  .MuiButton-root:hover {
+     /* Material UI handles hover states well, but you can enhance */
+     filter: brightness(95%); /* Slightly darken on hover */
+     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  }
+  
+  /* Table Hover Effects (If using Material UI Table) */
+  .MuiTableRow-root:hover {
+      background-color: #f1f3f5 !important; /* Use !important cautiously if needed to override MUI */
+      transition: background-color 0.2s ease-in-out;
+  }
+  
