@@ -376,7 +376,7 @@ function MesajIslemi() {
          <MessagingContainer maxWidth="lg" sx={{ flexGrow: 1, overflow: 'hidden' /* Prevent container scroll */ }}>
              {isTabletOrDesktop ? (
                  /* --- Desktop/Tablet: Split View --- */
-                 <Grid container spacing={0} sx={{ height: '100%' }}>
+                 <Grid container spacing={0}  sx={{ height: '100%',flexWrap: 'nowrap' }  }>
                      {/* Left Pane: Message List or Compose */}
                      <Grid item md={4} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                          <Box sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper', borderRadius: '8px 8px 0 0' }}>
@@ -390,7 +390,7 @@ function MesajIslemi() {
                          </MessageListPane>
                      </Grid>
                      {/* Right Pane: Message Detail or Compose Form */}
-                     <Grid item md={8} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                     <Grid item md={8} sx={{ height: '100%', display: 'flex', flexDirection: 'column',  }}>
                          <MessageContentPane>
                              {view === 'compose' ? renderMainContent() : (selectedMessage ? renderMainContent() : <Typography sx={{p: 2}}>Select a message to view.</Typography>)}
                          </MessageContentPane>
