@@ -121,34 +121,111 @@ function MesajIslemi() {
     // .env dosyasından almak daha iyidir, ancak basitlik için burada tanımlayalım
     const API_URL = 'http://localhost:5000/api'; // Backend adresiniz
   // --- Fetch Messages Effect (Simulated) ---
-  useEffect(() => {
-    // In a real app, fetch based on 'view' from your Express API
+  /* useEffect(() => {
+    
     console.log(`Fetching ${view}...`);
-    setLoading(true); // Yüklemeyi başlat
-    setTimeout(() => { // API gecikmesini simüle et
+    setLoading(true);
+    setTimeout(() => { 
     if (view === 'inbox') {
       setMessages(mockInbox);
     } else if (view === 'sent') {
       setMessages(mockSent);
     } else {
-      setMessages([]); // Clear messages for compose or detail view if needed
+      setMessages([]); 
     }
-    setSelectedMessage(null); // Clear selected message when view changes
-    setLoading(false); // Yüklemeyi bitir
-  }, 500); // 0.5 saniye gecikme
-  }, [view]);
+    setSelectedMessage(null); 
+    setLoading(false); 
+  }, 500); 
+  }, [view]); */
 
+  // --- Function to fetch messages ---
+  const fetchMessages = async (type) => {
+    setLoading(true);
+    setSelectedMessage(null); // Clear selected message when fetching new list
+    let endpoint = `${API_URL}/messages`; // Default: fetches all messages
+
+    // For a real application, you'd get the current logged-in user's ID
+    const currentUserId = 5; // Placeholder: Get this from your auth context or localStorage
+
+    if (type === 'inbox') {
+      // endpoint = `${API_URL}/messages`; // Original request: all messages
+      endpoint = `${API_URL}/messages/inbox?userId=${currentUserId}`; // Typical inbox: messages for current user
+    } else if (type === 'sent') {
+      endpoint = `${API_URL}/messages/sent?userId=${currentUserId}`; // Sent messages by current user
+    } else {
+      setMessages([]);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('authToken'); // If using token auth
+      const response = await axios.get(endpoint, {
+        // headers: {
+        //   'Authorization': `Bearer ${token}` // Include if your API is protected
+        // }
+      });
+      if (response.data && response.data.success) {
+        // Ensure the fetched data matches the structure expected by your ListItemText
+        // The backend should format it to: id, from, subject, preview, timestamp, body, read
+        setMessages(response.data.messages || []);
+      } else {
+        setMessages([]);
+        setNotification({
+            open: true,
+            message: response.data.message || 'Mesajlar yüklenemedi.',
+            severity: 'error',
+        });
+      }
+    } catch (error) {
+      console.error(`Error fetching ${type} messages:`, error);
+      setMessages([]);
+      let errorMessage = `Mesajlar yüklenirken bir hata oluştu (${type}).`;
+      if (error.response && error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+      } else if (error.request) {
+          errorMessage = 'Sunucuya ulaşılamıyor. Lütfen ağ bağlantınızı kontrol edin.';
+      }
+      setNotification({
+          open: true,
+          message: errorMessage,
+          severity: 'error',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+    // --- Fetch Messages Effect ---
+  useEffect(() => {
+    console.log(`Workspaceing ${view}...`);
+    if (view === 'inbox' || view === 'sent') {
+      fetchMessages(view);
+    } else {
+      setMessages([]); // Clear messages for compose or detail view if needed
+      setSelectedMessage(null);
+    }
+  }, [view]); // Re-fetch when 'view' changes
   // --- Handlers ---
   const handleNavigationChange = (event, newValue) => {
-    setView(newValue);
+     // Prevent navigating away if currently loading, or to the same view if not messageDetail
+    if (loading && newValue !== view) return;
+    if (newValue !== 'messageDetail') { // messageDetail is handled by handleSelectMessage
+        setView(newValue);
+    }
   };
 
-  const handleSelectMessage = (message) => {
-    // In a real app, fetch full message details here if needed
-    setSelectedMessage(message);
+  const handleSelectMessage = async (message) => {
+    // OPTIONAL: Fetch full message details if preview isn't enough
+    // For now, we assume 'body' is already fetched with the list
+    // You might also mark the message as 'read' on the backend here
+    // e.g., await axios.put(`${API_URL}/messages/read/${message.id}`);
+
+    setSelectedMessage(message); // The message object from backend should have 'body'
     if (!isTabletOrDesktop) {
-        setView('messageDetail'); // Switch view on mobile/tablet
+      setView('messageDetail');
     }
+    // Optionally, update the message in the list to mark as read visually
+    // setMessages(prevMessages => prevMessages.map(m => m.id === message.id ? {...m, read: true} : m));
   };
 
   const handleSendMessage = async (event) => {
@@ -223,9 +300,15 @@ function MesajIslemi() {
   };
 
   const handleBackToList = () => {
-      // Determine which list to go back to (e.g., based on previous view state)
-      setView('inbox'); // Default back to inbox for simplicity
-      setSelectedMessage(null);
+      // A simple logic to determine previous view, can be improved
+     if (selectedMessage && messages.some(m => m.id === selectedMessage.id && m.from)) { // Assuming 'from' means it was an inbox message
+        setView('inbox');
+     } else if (selectedMessage && messages.some(m => m.id === selectedMessage.id && m.to)) { // Assuming 'to' means it was a sent message
+        setView('sent');
+     } else {
+        setView('inbox'); // Default back to inbox
+     }
+     setSelectedMessage(null);
   }
  // Bildirim kapatma işleyicisi
  const handleCloseNotification = (event, reason) => {
@@ -238,7 +321,7 @@ function MesajIslemi() {
 
   // Content for the main area (list or compose form)
   const renderMainContent = () => {
-    if (loading && view !== 'compose') { // Compose formundayken listeyi yükleme gösterme
+    if (loading && (view === 'inbox' || view === 'sent')) { // Compose formundayken listeyi yükleme gösterme
       return <Typography sx={{ p: 2 }}>Yükleniyor...</Typography>;
  }
     switch (view) {
@@ -299,8 +382,8 @@ function MesajIslemi() {
                   </Typography>
                   <hr />
                   {/* In a real app, display the full message body here */}
-                  <Typography variant="body1" sx={{ mt: 2 }}>
-                      {selectedMessage.preview} ... (Full message content would go here)
+                  <Typography variant="body1" sx={{ mt: 2, whiteSpace: 'pre-wrap' /* To respect newlines in message */ }}>
+                      {selectedMessage.body || selectedMessage.preview} ... (Full message content would go here)
                   </Typography>
                   {/* Add Reply Button */}
                    <Button
@@ -324,12 +407,12 @@ function MesajIslemi() {
       default:
         return (
           <List>
-            {messages.length === 0 ? (
+            {messages.length === 0  && !loading ? (
                 <ListItem><ListItemText primary={`No ${view} messages.`} /></ListItem>
             ) : (
                 messages.map((msg) => (
                   <ListItem
-                    button // Make list item clickable
+                    button="true" // Make list item clickable
                     key={msg.id}
                     onClick={() => handleSelectMessage(msg)}
                     className={`message-item ${!msg.read && view === 'inbox' ? 'unread' : ''} ${selectedMessage?.id === msg.id && isTabletOrDesktop ? 'selected' : ''}`} // Add classes for styling
@@ -381,18 +464,18 @@ function MesajIslemi() {
                      <Grid item md={4} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                          <Box sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper', borderRadius: '8px 8px 0 0' }}>
                              {/* Tabs for Desktop/Tablet */}
-                             <Button onClick={() => setView('inbox')} startIcon={<InboxIcon />} variant={view === 'inbox' ? 'contained' : 'text'}  disabled={loading}>Inbox</Button>
-                             <Button onClick={() => setView('sent')} startIcon={<SendIcon />} variant={view === 'sent' ? 'contained' : 'text'} disabled={loading}>Sent</Button>
-                             <Button onClick={() => setView('compose')} startIcon={<CreateIcon />} variant={view === 'compose' ? 'contained' : 'text'} disabled={loading}>Compose</Button>
+                             <Button onClick={() => setView('inbox')} startIcon={<InboxIcon />} variant={view === 'inbox' || (view==='messageDetail' && selectedMessage?.from) ? 'contained' : 'text'}  disabled={loading}>Inbox</Button>
+                             <Button onClick={() => setView('sent')} startIcon={<SendIcon />} variant={view === 'sent' || (view==='messageDetail' && selectedMessage?.to) ? 'contained' : 'text'} disabled={loading}>Sent</Button>
+                             <Button onClick={() => setView('compose')} startIcon={<CreateIcon />} variant={view === 'compose' ? 'contained' : 'text'} disabled={loading && view !=='compose'}>Compose</Button>
                          </Box>
                          <MessageListPane sx={{ flexGrow: 1, borderRight: 1, borderColor: 'divider', borderRadius: '0 0 8px 8px' }}>
-                         {view === 'inbox' || view === 'sent' ? renderMainContent() : <Typography sx={{ p: 2 }}>Gelen/Gönderilen kutusunu seçin veya sağdan yeni mesaj oluşturun.</Typography>}
+                         {view === 'inbox' || view === 'sent' ? renderMainContent() : (view === 'compose' && <Typography sx={{ p: 2 }}>Yeni mesaj oluşturmak için sağdaki formu kullanın.</Typography> )}
                          </MessageListPane>
                      </Grid>
                      {/* Right Pane: Message Detail or Compose Form */}
-                     <Grid item md={8} sx={{ height: '100%', display: 'flex', flexDirection: 'column',  }}>
+                     <Grid item md={8} sx={{ height: '100%', display: 'flex', flexDirection: 'column'  }}>
                          <MessageContentPane>
-                             {view === 'compose' ? renderMainContent() : (selectedMessage ? renderMainContent() : <Typography sx={{p: 2}}>Select a message to view.</Typography>)}
+                             {view === 'compose' ? renderMainContent() : (selectedMessage && view === 'messageDetail' ? renderMainContent() : <Typography sx={{p: 2}}>Select a message to view.</Typography>)}
                          </MessageContentPane>
                      </Grid>
                  </Grid>
@@ -401,7 +484,7 @@ function MesajIslemi() {
                  <Box sx={{ height: '100%', overflowY: 'auto', paddingBottom: '56px' /* Space for bottom nav */ }}>
                      {/* Show back button if in detail view */}
                      {view === 'messageDetail' && selectedMessage && (
-                         <IconButton onClick={handleBackToList} sx={{ mb: 1 }}>
+                         <IconButton onClick={handleBackToList} sx={{ mb: 1, mt:1, ml:1 }}>
                              <ArrowBackIcon />
                          </IconButton>
                      )}
@@ -416,12 +499,16 @@ function MesajIslemi() {
              <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1 }} elevation={3}>
                  <BottomNavigation
                      showLabels
-                     value={view === 'messageDetail' ? (messages === mockInbox ? 'inbox' : 'sent') : view} // Highlight correct icon even in detail view
-                     onChange={handleNavigationChange}
+                     value={view === 'messageDetail' ? (selectedMessage?.from ? 'inbox' : (selectedMessage?.to ? 'sent' : 'inbox')) : view} // Highlight correct icon even in detail view
+                     onChange={(event, newValue) => {
+                    if (newValue !== 'messageDetail') { // 'messageDetail' isn't a direct navigation target
+                        setView(newValue);
+                    }
+                  }} 
                  >
                      <BottomNavigationAction label="Inbox" value="inbox" icon={<InboxIcon />} disabled={loading}  />
                      <BottomNavigationAction label="Sent" value="sent" icon={<SendIcon />}  disabled={loading} />
-                     <BottomNavigationAction label="Compose" value="compose" icon={<CreateIcon />}  disabled={loading} />
+                     <BottomNavigationAction label="Compose" value="compose" icon={<CreateIcon />}  disabled={loading && view !=='compose'} />
                  </BottomNavigation>
              </Paper>
          )}

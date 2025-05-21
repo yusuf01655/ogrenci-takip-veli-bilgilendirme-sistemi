@@ -9,6 +9,8 @@ const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const authRoutes = require('./routes/authRoutes');
 const ogrenciRoutes = require('./routes/ogrenciRoutes');
+const messagesRouter = require('./routes/messages'); // Adjust path as needed
+
 const app = express();
 
 // --- Güvenlik Middleware'leri ---
@@ -40,6 +42,7 @@ app.use('/login', loginLimiter);
 // Ana Rotalar
 app.use('/api/auth', authRoutes); // /api/auth altındaki tüm istekleri authRoutes'a yönlendir
 app.use('/api/ogrenciler', ogrenciRoutes);
+app.use('/api/messages', messagesRouter); // All routes in messages.js will be prefixed with /api/messages
 
 // Basit bir test route'u
 app.get('/', (req, res) => {

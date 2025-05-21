@@ -52,7 +52,7 @@ function YoneticiAnasayfa() {
 
   // --- Örnek Veriler (Değişiklik Yok) ---
   const yöneticiAdi = "Ahmet Yılmaz";
-  const okulAdi = "Gelecek Koleji";
+  const okulAdi = "İskenderun Lisesi";
   const kpiData = {
     ogrenciSayisi: 1250,
     ogretmenSayisi: 85,
