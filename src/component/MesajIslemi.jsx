@@ -201,8 +201,8 @@ function MesajIslemi() {
     if (view === 'inbox' || view === 'sent') {
       fetchMessages(view);
     } else {
-      setMessages([]); // Clear messages for compose or detail view if needed
-      setSelectedMessage(null);
+    /*   setMessages([]); // Clear messages for compose or detail view if needed
+      setSelectedMessage(null); */
     }
   }, [view]); // Re-fetch when 'view' changes
   // --- Handlers ---
@@ -300,15 +300,22 @@ function MesajIslemi() {
   };
 
   const handleBackToList = () => {
-      // A simple logic to determine previous view, can be improved
-     if (selectedMessage && messages.some(m => m.id === selectedMessage.id && m.from)) { // Assuming 'from' means it was an inbox message
-        setView('inbox');
-     } else if (selectedMessage && messages.some(m => m.id === selectedMessage.id && m.to)) { // Assuming 'to' means it was a sent message
-        setView('sent');
-     } else {
-        setView('inbox'); // Default back to inbox
-     }
-     setSelectedMessage(null);
+    // Determine which list to go back to.
+    // This logic assumes 'from' means inbox and 'to' means sent.
+    // You might need a more robust way to determine the origin view.
+    if (selectedMessage) {
+        // A more robust way would be to store the previous view before going to messageDetail
+        // For now, this heuristic might work.
+        const wasInbox = messages.some(m => m.id === selectedMessage.id && m.from_user_id); // Example: check if it has a 'from_user_id'
+        const wasSent = messages.some(m => m.id === selectedMessage.id && m.to_user_id); // Example: check if it has a 'to_user_id'
+
+        if (wasInbox) setView('inbox');
+        else if (wasSent) setView('sent');
+        else setView('inbox'); // Default fallback
+    } else {
+        setView('inbox'); // Default if no message was selected
+    }
+    setSelectedMessage(null); // Clear selected message
   }
  // Bildirim kapatma işleyicisi
  const handleCloseNotification = (event, reason) => {
@@ -322,7 +329,7 @@ function MesajIslemi() {
   // Content for the main area (list or compose form)
   const renderMainContent = () => {
     if (loading && (view === 'inbox' || view === 'sent')) { // Compose formundayken listeyi yükleme gösterme
-      return <Typography sx={{ p: 2 }}>Yükleniyor...</Typography>;
+      return <Typography sx={{ p: 2 , textAlign: 'center' }}>Yükleniyor...</Typography>;
  }
     switch (view) {
       case 'compose':
@@ -364,26 +371,26 @@ function MesajIslemi() {
             </Button>
           </ComposeForm>
         );
-      case 'messageDetail':
+      case 'messageDetail': //burdayım incelemede
         if (!selectedMessage) return <Typography sx={{ p: 2 }}>Görüntülemek için bir mesaj seçin.</Typography>;
           return (
               <Box>
                   {isMobile && ( // Show back button only on mobile when in detail view
-                      <IconButton onClick={handleBackToList} sx={{ mb: 1 }}>
+                      <IconButton onClick={handleBackToList} sx={{ mb: 1 ,display: { md: 'none' }}}>
                           <ArrowBackIcon />
                       </IconButton>
                   )}
-                  <Typography variant="h6">{selectedMessage.subject}</Typography>
+                  <Typography variant="h6" gutterBottom >{selectedMessage.subject|| "No Subject"}</Typography>
                   <Typography variant="subtitle1" color="textSecondary">
-                      {selectedMessage.from ? `From: ${selectedMessage.from}` : `To: ${selectedMessage.to}`}
+                      {selectedMessage.from_user_id  ? `From: ${selectedMessage.sender_name || selectedMessage.from_user_id}` : `To: ${selectedMessage.receiver_name || selectedMessage.to_user_id}`}
                   </Typography>
                   <Typography variant="caption" color="textSecondary" display="block" gutterBottom>
-                      {selectedMessage.timestamp}
+                      {selectedMessage.created_at ? new Date(selectedMessage.created_at).toLocaleString() : "No timestamp"}
                   </Typography>
-                  <hr />
+                  <hr style={{ margin: '16px 0' }}/>
                   {/* In a real app, display the full message body here */}
-                  <Typography variant="body1" sx={{ mt: 2, whiteSpace: 'pre-wrap' /* To respect newlines in message */ }}>
-                      {selectedMessage.body || selectedMessage.preview} ... (Full message content would go here)
+                  <Typography variant="body1" sx={{ mt: 2, whiteSpace: 'pre-wrap', wordBreak: 'break-word' /* To respect newlines in message */ }}>
+                      {selectedMessage.body || "Full message content is not available."}
                   </Typography>
                   {/* Add Reply Button */}
                    <Button
@@ -405,11 +412,12 @@ function MesajIslemi() {
       case 'inbox':
       case 'sent':
       default:
+        if (messages.length === 0 && !loading) {
+                  return <ListItem><ListItemText primary={`No ${view} messages.`} sx={{textAlign: 'center'}} /></ListItem>;
+                }
         return (
           <List>
-            {messages.length === 0  && !loading ? (
-                <ListItem><ListItemText primary={`No ${view} messages.`} /></ListItem>
-            ) : (
+            {
                 messages.map((msg) => (
                   <ListItem
                     button="true" // Make list item clickable
@@ -421,20 +429,27 @@ function MesajIslemi() {
 
                   >
                     <ListItemText
-                      primary={view === 'inbox' ? `From: ${msg.from}` : `To: ${msg.to}`}
-                      secondary={
+                      primary={
+                                          <Typography component="span" sx={{ fontWeight: (view === 'inbox' && !msg.is_read) ? 'bold' : 'normal' }}>
+                                               {view === 'inbox' ? `From: ${msg.sender_name || msg.from_user_id}` : `To: ${msg.receiver_name || msg.to_user_id}`}
+                                          </Typography>}
+                      secondary={  
                         <>
-                          <Typography component="span" variant="body2" color="textPrimary" sx={{ fontWeight: !msg.read && view === 'inbox' ? 'bold' : 'normal' }}>
-                            {msg.subject}
+                          <Typography component="span" variant="body2" color="textPrimary" sx={{ fontWeight: (view === 'inbox' && !msg.is_read) ? 'bold' : 'normal' }}>
+                           {msg.subject || "(No Subject)"}
                           </Typography>
-                          {" — "}{msg.preview}
+                          {" — "}{msg.preview || (msg.body ? msg.body.substring(0, 50) + '...' : 'No preview')}
                         </>
                       }
                     />
-                     <Typography variant="caption" sx={{ ml: 2, whiteSpace: 'nowrap', fontWeight: !msg.read && view === 'inbox' ? 'bold' : 'normal' }}>{msg.timestamp}</Typography>
+                     <Typography variant="caption" sx={{ ml: 2, whiteSpace: 'nowrap', fontWeight: (view === 'inbox' && !msg.is_read) ? 'bold' : 'normal' }}>
+                                         {msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ""}
+                                         <br/>
+                                         {msg.created_at ? new Date(msg.created_at).toLocaleDateString() : ""}
+                                     </Typography>
                   </ListItem>
                 ))
-            )}
+            }
           </List>
         );
     }
