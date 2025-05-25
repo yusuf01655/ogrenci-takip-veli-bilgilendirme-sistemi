@@ -90,4 +90,44 @@ body {
       background-color: #f1f3f5 !important; /* Use !important cautiously if needed to override MUI */
       transition: background-color 0.2s ease-in-out;
   }
+    /* Adjust the right pane for larger screens */
+  @media (min-width: 1200px) {
+    .MuiPaper-root.MessageContentPane {
+   
+   
+ 
+    }
+  }
   
+  /* Add additional refinements for ultra-wide screens */
+  @media (min-width: 1600px) {
+    .MuiPaper-root.MessageContentPane {
+      min-width: 1400px; /* Even wider pane for ultra-wide screens */
+      padding: 40px; /* Further increase padding */
+    }
+  }
+  
+  .message-detail {
+  margin-bottom: 16px; /* Detaylar arasında boşluk */
+  width: 100%; /* Tam genişlik */
+}
+.message-detail .label {
+  font-weight: bold;
+  margin-bottom: 4px; /* Etiket ile içerik arasında boşluk */
+}
+.message-detail .content {
+  word-wrap: break-word; /* Uzun metinleri kır */
+  white-space: pre-wrap; /* Yeni satırları koru */
+}
+  /* Right panel button alignment */
+.message-detail-buttons {
+  display: flex;
+  justify-content: flex-start;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+/* Ensure proper spacing for the right panel */
+.MuiPaper-root.MessageContentPane {
+ 
+}

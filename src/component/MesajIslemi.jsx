@@ -81,6 +81,22 @@ const MessageContentPane = styled(Paper)(({ theme }) => ({
   height: '100%', // Fill available height in Grid item
   display: 'flex',
   flexDirection: 'column',
+  minWidth: '300px',
+  [theme.breakpoints.up('lg')]: {
+    minWidth: '800px', // Wider pane for large screens
+       maxWidth:'900px', /* Sağ panel genişliği */
+      margin: '0 auto',
+      
+    padding: '32px', /* Daha geniş padding */
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)', /* Hafif gölge */
+    borderRadius: '12px', /* Yuvarlatılmış köşeler */
+    
+
+   
+   
+
+    padding: theme.spacing(4), // Increase padding for better spacing
+  },
    [theme.breakpoints.down('md')]: {
         marginLeft: 0,
    },
@@ -137,7 +153,80 @@ function MesajIslemi() {
     setLoading(false); 
   }, 500); 
   }, [view]); */
-
+ const handleDeleteMessage = async () => {
+    if (!selectedMessage) return;
+    try {
+      const response = await axios.delete(`${API_URL}/messages/${selectedMessage.id}`);
+      if (response.data.success) {
+        setNotification({
+          open: true,
+          message: 'Mesaj başarıyla silindi.',
+          severity: 'success',
+        });
+        setMessages(messages.filter((msg) => msg.id !== selectedMessage.id));
+        setSelectedMessage(null);
+      } else {
+        setNotification({
+          open: true,
+          message: response.data.message || 'Mesaj silinemedi.',
+          severity: 'error',
+        });
+      }
+    } catch (error) {
+      console.error('Mesaj silme API hatası:', error);
+      setNotification({
+        open: true,
+        message: 'Mesaj silinirken bir hata oluştu.',
+        severity: 'error',
+      });
+    }
+  };
+const handleMarkAsReadUnread = async () => {
+    if (!selectedMessage) return;
+    try {
+      const updatedMessage = { ...selectedMessage, read: !selectedMessage.read };
+      const response = await axios.put(`${API_URL}/messages/${selectedMessage.id}`, updatedMessage);
+      if (response.data.success) {
+        setNotification({
+          open: true,
+          message: `Mesaj ${updatedMessage.read ? 'okundu olarak işaretlendi' : 'okunmadı olarak işaretlendi'}.`,
+          severity: 'success',
+        });
+        setMessages(
+          messages.map((msg) =>
+            msg.id === selectedMessage.id ? { ...msg, read: updatedMessage.read } : msg
+          )
+        );
+        setSelectedMessage(updatedMessage);
+      } else {
+        setNotification({
+          open: true,
+          message: response.data.message || 'Mesaj durumu güncellenemedi.',
+          severity: 'error',
+        });
+      }
+    } catch (error) {
+      console.error('Mesaj durumu güncelleme API hatası:', error);
+      setNotification({
+        open: true,
+        message: 'Mesaj durumu güncellenirken bir hata oluştu.',
+        severity: 'error',
+      });
+    }
+  };
+  const handleReply = () => {
+    if (!selectedMessage) return;
+    setView('compose');
+    setTimeout(() => {
+      // Pre-fill the compose form
+      const form = document.querySelector('form');
+      if (form) {
+        form.recipient.value = selectedMessage.sender_name || selectedMessage.from_user_id;
+        form.subject.value = `Re: ${selectedMessage.subject}`;
+        form.messageBody.value = `\n\n--- Orijinal Mesaj ---\n${selectedMessage.body}`;
+      }
+    }, 0);
+  };
   // --- Function to fetch messages ---
   const fetchMessages = async (type) => {
     setLoading(true);
@@ -331,6 +420,45 @@ function MesajIslemi() {
     if (loading && (view === 'inbox' || view === 'sent')) { // Compose formundayken listeyi yükleme gösterme
       return <Typography sx={{ p: 2 , textAlign: 'center' }}>Yükleniyor...</Typography>;
  }
+ // New branch for tablet/desktop detail view: only display the selected message’s details
+    if (isTabletOrDesktop && selectedMessage) {
+        return (
+            <Box sx={{ textAlign: 'left', maxHeight: '80vh', overflowY: 'auto', padding: 2 }}>
+                {/* Who is the message from (or to) */}
+                <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                    {selectedMessage.from_user_id 
+                        ? `Kimden: ${selectedMessage.sender_name || selectedMessage.from_user_id}` 
+                        : `Kime: ${selectedMessage.receiver_name || selectedMessage.to_user_id}`}
+                </Typography>
+                {/* Subject */}
+                <Typography variant="h6" gutterBottom>
+                    Konu: {selectedMessage.subject || "No Subject"}
+                </Typography>
+                {/* Date and time */}
+                <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
+                    Tarih: {selectedMessage.created_at ? new Date(selectedMessage.created_at).toLocaleDateString() : "No timestamp"} &nbsp;
+                    Saat: {selectedMessage.created_at ? new Date(selectedMessage.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ""}
+                </Typography>
+                <hr style={{ margin: '16px 0' }}/>
+                {/* Message content */}
+                <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', mb: 3 }}>
+                    {selectedMessage.body || "Mesaj içeriği bulunamadı."}
+                </Typography>
+                {/* Action buttons side by side */}
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                    <Button variant="outlined" color="secondary" startIcon={<CreateIcon />} onClick={handleReply}>
+                        Yanıtla
+                    </Button>
+                    <Button variant="outlined" color="error" onClick={handleDeleteMessage}>
+                        Sil
+                    </Button>
+                    <Button variant="outlined" onClick={handleMarkAsReadUnread}>
+                        {selectedMessage.read ? 'Okunmadı olarak işaretle' : 'Okundu olarak işaretle'}
+                    </Button>
+                </Box>
+            </Box>
+        );
+    }
     switch (view) {
       case 'compose':
         return (
@@ -393,20 +521,30 @@ function MesajIslemi() {
                       {selectedMessage.body || "Full message content is not available."}
                   </Typography>
                   {/* Add Reply Button */}
+                  <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
                    <Button
                       variant="outlined"
                       color="secondary"
                       startIcon={<CreateIcon />}
                       sx={{ mt: 3 }}
-                      onClick={() => {
-                          console.log("Replying to message:", selectedMessage.id);
-                          // TODO: Navigate to compose view, pre-filling fields
-                          setView('compose');
-                          // You'd likely pass message details to pre-fill the compose form
-                      }}
+                      onClick={handleReply}
                     >
                       Reply
                     </Button>
+                    <Button
+                variant="outlined"
+                color="error"
+                onClick={handleDeleteMessage}
+              >
+                Delete
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={handleMarkAsReadUnread}
+              >
+                {selectedMessage.read ? 'Mark as Unread' : 'Mark as Read'}
+              </Button>
+              </Box>
               </Box>
           );
       case 'inbox':
@@ -430,19 +568,19 @@ function MesajIslemi() {
                   >
                     <ListItemText
                       primary={
-                                          <Typography component="span" sx={{ fontWeight: (view === 'inbox' && !msg.is_read) ? 'bold' : 'normal' }}>
+                                          <Typography component="span" sx={{ fontWeight: view === 'inbox' && !msg.is_read ? 'bold' : 'normal' }}>
                                                {view === 'inbox' ? `From: ${msg.sender_name || msg.from_user_id}` : `To: ${msg.receiver_name || msg.to_user_id}`}
                                           </Typography>}
                       secondary={  
                         <>
-                          <Typography component="span" variant="body2" color="textPrimary" sx={{ fontWeight: (view === 'inbox' && !msg.is_read) ? 'bold' : 'normal' }}>
+                          <Typography component="span" variant="body2" color="textPrimary" sx={{ fontWeight: view === 'inbox' && !msg.is_read ? 'bold' : 'normal' }}>
                            {msg.subject || "(No Subject)"}
                           </Typography>
                           {" — "}{msg.preview || (msg.body ? msg.body.substring(0, 50) + '...' : 'No preview')}
                         </>
                       }
                     />
-                     <Typography variant="caption" sx={{ ml: 2, whiteSpace: 'nowrap', fontWeight: (view === 'inbox' && !msg.is_read) ? 'bold' : 'normal' }}>
+                     <Typography variant="caption" sx={{ ml: 2, whiteSpace: 'nowrap', fontWeight: view === 'inbox' && !msg.is_read  ? 'bold' : 'normal' }}>
                                          {msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ""}
                                          <br/>
                                          {msg.created_at ? new Date(msg.created_at).toLocaleDateString() : ""}
@@ -483,14 +621,20 @@ function MesajIslemi() {
                              <Button onClick={() => setView('sent')} startIcon={<SendIcon />} variant={view === 'sent' || (view==='messageDetail' && selectedMessage?.to) ? 'contained' : 'text'} disabled={loading}>Sent</Button>
                              <Button onClick={() => setView('compose')} startIcon={<CreateIcon />} variant={view === 'compose' ? 'contained' : 'text'} disabled={loading && view !=='compose'}>Compose</Button>
                          </Box>
-                         <MessageListPane sx={{ flexGrow: 1, borderRight: 1, borderColor: 'divider', borderRadius: '0 0 8px 8px' }}>
+                         <MessageListPane sx={{  flexGrow: 1, borderRight: 1, borderColor: 'divider', borderRadius: '0 0 8px 8px' }}>
                          {view === 'inbox' || view === 'sent' ? renderMainContent() : (view === 'compose' && <Typography sx={{ p: 2 }}>Yeni mesaj oluşturmak için sağdaki formu kullanın.</Typography> )}
                          </MessageListPane>
                      </Grid>
                      {/* Right Pane: Message Detail or Compose Form */}
                      <Grid item md={8} sx={{ height: '100%', display: 'flex', flexDirection: 'column'  }}>
-                         <MessageContentPane>
-                             {view === 'compose' ? renderMainContent() : (selectedMessage && view === 'messageDetail' ? renderMainContent() : <Typography sx={{p: 2}}>Select a message to view.</Typography>)}
+                         <MessageContentPane sx={{
+                      padding: { xs: 2, md: 4 }, // Mobilde daha dar, büyük ekranda daha geniş padding
+                      maxWidth: { lg: '900px', xl: '1200px' }, // Büyük ekranlarda genişlik artırıldı
+                      margin: '0 auto', // Ortalamak için
+                      boxShadow: { lg: '0 4px 12px rgba(0, 0, 0, 0.1)' }, // Büyük ekranlarda gölge ekle
+                      borderRadius: '12px', // Daha modern bir görünüm için yuvarlatılmış köşeler
+                  }}>
+                             {view === 'compose' ? renderMainContent() : (selectedMessage ? renderMainContent() : <Typography sx={{p: 2}}>Select a message to view.</Typography>)}
                          </MessageContentPane>
                      </Grid>
                  </Grid>
