@@ -153,6 +153,85 @@ function MesajIslemi() {
     setLoading(false); 
   }, 500); 
   }, [view]); */
+   const renderMessageList = () => {
+    if (messages.length === 0 && !loading) {
+      return (
+        <ListItem>
+          <ListItemText primary={`No ${view} messages.`} sx={{ textAlign: 'center' }} />
+        </ListItem>
+      );
+    }
+    return (
+      <List>
+        {messages.map((msg) => (
+          <ListItem
+            button="true"
+            key={msg.id}
+            onClick={() => handleSelectMessage(msg)}
+            className={`message-item ${!msg.read && view === 'inbox' ? 'unread' : ''} ${selectedMessage?.id === msg.id && isTabletOrDesktop ? 'selected' : ''}`}
+            divider
+            selected={selectedMessage?.id === msg.id && isTabletOrDesktop}
+          >
+            <ListItemText
+              primary={
+                <Typography component="span" sx={{ fontWeight: view === 'inbox' && !msg.is_read ? 'bold' : 'normal' }}>
+                  {view === 'inbox' ? `From: ${msg.sender_name || msg.from_user_id}` : `To: ${msg.receiver_name || msg.to_user_id}`}
+                </Typography>
+              }
+              secondary={
+                <>
+                  <Typography component="span" variant="body2" color="textPrimary" sx={{ fontWeight: view === 'inbox' && !msg.is_read ? 'bold' : 'normal' }}>
+                    {msg.subject || "(No Subject)"}
+                  </Typography>
+                  {" — "}
+                  {msg.preview || (msg.body ? msg.body.substring(0, 50) + '...' : 'No preview')}
+                </>
+              }
+            />
+            <Typography variant="caption" sx={{ ml: 2, whiteSpace: 'nowrap', fontWeight: view === 'inbox' && !msg.is_read ? 'bold' : 'normal' }}>
+              {msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' }) : ""}
+              <br/>
+              {msg.created_at ? new Date(msg.created_at).toLocaleDateString() : ""}
+            </Typography>
+          </ListItem>
+        ))}
+      </List>
+    );
+  };
+    const renderMessageDetails = () => {
+    if (!selectedMessage) return <Typography sx={{ p: 2 }}>Görüntülemek için bir mesaj seçin.</Typography>;
+    return (
+      <Box sx={{ textAlign: 'left', maxHeight: '80vh', overflowY: 'auto', padding: 2 }}>
+        <Typography variant="subtitle2" sx={{ mb: 1 }}>
+          {selectedMessage.from_user_id 
+            ? `Kimden: ${selectedMessage.sender_name || selectedMessage.from_user_id}`
+            : `Kime: ${selectedMessage.receiver_name || selectedMessage.to_user_id}`}
+        </Typography>
+        <Typography variant="h6" gutterBottom>
+          Konu: {selectedMessage.subject || "No Subject"}
+        </Typography>
+        <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
+          Tarih: {selectedMessage.created_at ? new Date(selectedMessage.created_at).toLocaleDateString() : "No timestamp"} &nbsp;
+          Saat: {selectedMessage.created_at ? new Date(selectedMessage.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ""}
+        </Typography>
+        <hr style={{ margin: '16px 0' }}/>
+        <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', mb: 3 }}>
+          {selectedMessage.body || "Mesaj içeriği bulunamadı."}
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Button variant="outlined" color="secondary" startIcon={<CreateIcon />} onClick={handleReply}>
+            Yanıtla
+          </Button>
+          <Button style={{ display: 'none' }} variant="outlined" color="error" onClick={handleDeleteMessage}>
+            Sil
+          </Button>
+          <Button style={{ display: 'none' }} variant="outlined" onClick={handleMarkAsReadUnread}>
+            {selectedMessage.read ? 'Okunmadı olarak işaretle' : 'Okundu olarak işaretle'}
+          </Button>
+        </Box>
+      </Box>
+    );
+  };
  const handleDeleteMessage = async () => {
     if (!selectedMessage) return;
     try {
@@ -449,10 +528,10 @@ const handleMarkAsReadUnread = async () => {
                     <Button variant="outlined" color="secondary" startIcon={<CreateIcon />} onClick={handleReply}>
                         Yanıtla
                     </Button>
-                    <Button variant="outlined" color="error" onClick={handleDeleteMessage}>
+                    <Button style={{ display: 'none' }} variant="outlined" color="error" onClick={handleDeleteMessage}>
                         Sil
                     </Button>
-                    <Button variant="outlined" onClick={handleMarkAsReadUnread}>
+                    <Button style={{ display: 'none' }} variant="outlined" onClick={handleMarkAsReadUnread}>
                         {selectedMessage.read ? 'Okunmadı olarak işaretle' : 'Okundu olarak işaretle'}
                     </Button>
                 </Box>
@@ -535,12 +614,14 @@ const handleMarkAsReadUnread = async () => {
                 variant="outlined"
                 color="error"
                 onClick={handleDeleteMessage}
+                style={{ display: 'none' }}
               >
                 Delete
               </Button>
               <Button
                 variant="outlined"
                 onClick={handleMarkAsReadUnread}
+                style={{ display: 'none' }}
               >
                 {selectedMessage.read ? 'Mark as Unread' : 'Mark as Read'}
               </Button>
@@ -619,10 +700,12 @@ const handleMarkAsReadUnread = async () => {
                              {/* Tabs for Desktop/Tablet */}
                              <Button onClick={() => setView('inbox')} startIcon={<InboxIcon />} variant={view === 'inbox' || (view==='messageDetail' && selectedMessage?.from) ? 'contained' : 'text'}  disabled={loading}>Inbox</Button>
                              <Button onClick={() => setView('sent')} startIcon={<SendIcon />} variant={view === 'sent' || (view==='messageDetail' && selectedMessage?.to) ? 'contained' : 'text'} disabled={loading}>Sent</Button>
-                             <Button onClick={() => setView('compose')} startIcon={<CreateIcon />} variant={view === 'compose' ? 'contained' : 'text'} disabled={loading && view !=='compose'}>Compose</Button>
+                             <Button onClick={() => {
+                              setSelectedMessage(null); // Clear selected message when composing
+                              setView('compose')}} startIcon={<CreateIcon />} variant={view === 'compose' ? 'contained' : 'text'} disabled={loading && view !=='compose'}>Compose</Button>
                          </Box>
                          <MessageListPane sx={{  flexGrow: 1, borderRight: 1, borderColor: 'divider', borderRadius: '0 0 8px 8px' }}>
-                         {view === 'inbox' || view === 'sent' ? renderMainContent() : (view === 'compose' && <Typography sx={{ p: 2 }}>Yeni mesaj oluşturmak için sağdaki formu kullanın.</Typography> )}
+                         {view === 'inbox' || view === 'sent' ? renderMessageList() : (view === 'compose' && <Typography sx={{ p: 2 }}>Yeni mesaj oluşturmak için sağdaki formu kullanın.</Typography> )}
                          </MessageListPane>
                      </Grid>
                      {/* Right Pane: Message Detail or Compose Form */}
@@ -634,7 +717,7 @@ const handleMarkAsReadUnread = async () => {
                       boxShadow: { lg: '0 4px 12px rgba(0, 0, 0, 0.1)' }, // Büyük ekranlarda gölge ekle
                       borderRadius: '12px', // Daha modern bir görünüm için yuvarlatılmış köşeler
                   }}>
-                             {view === 'compose' ? renderMainContent() : (selectedMessage ? renderMainContent() : <Typography sx={{p: 2}}>Select a message to view.</Typography>)}
+                             {view === 'compose' ? renderMainContent() : (selectedMessage ? renderMessageDetails() : <Typography sx={{p: 2}}>Select a message to view.</Typography>)}
                          </MessageContentPane>
                      </Grid>
                  </Grid>
