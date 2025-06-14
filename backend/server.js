@@ -132,7 +132,8 @@ app.post('/login', async (req, res) => {
     res.status(200).json({
       message: 'Giriş başarılı!',
       token: token,
-      rol: user.rol
+      rol: user.rol,
+      userId: user.id
     });
 
   } catch (error) {

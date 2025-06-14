@@ -313,8 +313,8 @@ const handleMarkAsReadUnread = async () => {
     let endpoint = `${API_URL}/messages`; // Default: fetches all messages
 
     // For a real application, you'd get the current logged-in user's ID
-    const currentUserId = 5; // Placeholder: Get this from your auth context or localStorage
-
+    const currentUserId = localStorage.getItem('userId'); // Placeholder: Get this from your auth context or localStorage
+    console.log('currentUserId from localStorage:', currentUserId);
     if (type === 'inbox') {
       // endpoint = `${API_URL}/messages`; // Original request: all messages
       endpoint = `${API_URL}/messages/inbox?userId=${currentUserId}`; // Typical inbox: messages for current user

@@ -154,6 +154,7 @@ const theme = createTheme({
         // localStorage: Tarayıcı kapatılsa bile kalır.
         // sessionStorage: Sekme/tarayıcı kapatılınca silinir.
         localStorage.setItem('authToken', response.data.token);
+       localStorage.setItem('userId', response.data.userId);
         // veya: sessionStorage.setItem('authToken', response.data.token);
         const userRole = response.data.rol;
         console.log('backendden gelen Kullanıcı Rolü:', userRole);
