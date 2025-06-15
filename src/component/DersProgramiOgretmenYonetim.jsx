@@ -275,10 +275,12 @@ export default function DersProgramiOgretmenYonetim() {
         }
 
         // Çakışma kontrolü
+        const key = `${day}-${period}`;
         for (const className in scheduleData) {
-            const key = `${day}-${period}`;
+            // Sadece başka sınıflarda aynı anda aynı öğretmen var mı kontrol et
+            if (className === selectedClass) continue;
             const existingLesson = scheduleData[className]?.[key];
-            if (className !== selectedClass && existingLesson && existingLesson.teacher === currentLesson.teacher) {
+            if (existingLesson && existingLesson.teacher === currentLesson.teacher) {
                 setNotification({
                     open: true,
                     message: `Çakışma! ${currentLesson.teacher}, ${className} sınıfında aynı saatte derse giriyor.`,
@@ -287,8 +289,6 @@ export default function DersProgramiOgretmenYonetim() {
                 return;
             }
         }
-        
-        const key = `${day}-${period}`;
         const updatedClassSchedule = { ...(scheduleData[selectedClass] || {}), [key]: currentLesson };
         setScheduleData({ ...scheduleData, [selectedClass]: updatedClassSchedule });
         
