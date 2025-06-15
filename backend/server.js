@@ -10,6 +10,7 @@ const helmet = require('helmet');
 const authRoutes = require('./routes/authRoutes');
 const ogrenciRoutes = require('./routes/ogrenciRoutes');
 const messagesRouter = require('./routes/messages'); // Adjust path as needed
+const scheduleRoutes = require('./routes/scheduleRoutes');
 
 const app = express();
 
@@ -43,6 +44,7 @@ app.use('/login', loginLimiter);
 app.use('/api/auth', authRoutes); // /api/auth altındaki tüm istekleri authRoutes'a yönlendir
 app.use('/api/ogrenciler', ogrenciRoutes);
 app.use('/api/messages', messagesRouter); // All routes in messages.js will be prefixed with /api/messages
+app.use('/api', scheduleRoutes);
 
 // Basit bir test route'u
 app.get('/', (req, res) => {

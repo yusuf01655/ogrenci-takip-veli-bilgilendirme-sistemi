@@ -121,7 +121,7 @@ function YoneticiAnasayfa() {
           { text: 'Öğrenci İşlemleri', icon: <PeopleIcon />, path: '/ogrenciler' },
           { text: 'Öğretmen İşlemleri', icon: <PersonIcon />, path: '/ogretmenler' },
           { text: 'Veli İşlemleri', icon: <SupervisorAccountIcon />, path: '/veliler' },
-          { text: 'Ders Programı', icon: <CalendarTodayIcon />, path: '/ders-programi' },
+          { text: 'Ders Programı', icon: <CalendarTodayIcon />, path: '/dersprogrami' },
           { text: 'Yoklama İşlemleri', icon: <CheckCircleOutlineIcon />, path: '/yoklama' },
           { text: 'Not İşlemleri', icon: <AssignmentIcon />, path: '/notlar' },
           { text: 'Duyurular', icon: <CampaignIcon />, path: '/duyurular' },
