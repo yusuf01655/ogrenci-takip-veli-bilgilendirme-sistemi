@@ -57,11 +57,14 @@ router.get('/classes', async (req, res) => {
 });
 
 // Get all teachers
-router.get('/teachers', (req, res) => {
-  db.query('SELECT * FROM ogretmen', (err, results) => {
-    if (err) return res.status(500).json({ error: err });
+router.get('/teachers', async (req, res) => {
+  try {
+    const [results] = await db.query('SELECT * FROM ogretmen');
     res.json(results);
-  });
+    console.log(results);
+  } catch (err) {
+    return res.status(500).json({ error: err });
+  }
 });
 
 // Get all lessons

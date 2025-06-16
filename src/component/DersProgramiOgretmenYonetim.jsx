@@ -52,7 +52,7 @@ const timeSlots = {
 
 /* const classNames = ['9/A', '9/B', '10/A', '10/B', '11/A', '11/C']; */
 
-const teachers = ['Ayşe Yılmaz', 'Mehmet Öztürk', 'Fatma Kaya', 'Ali Veli', 'Zeynep Demir'];
+/* const teachers = ['Ayşe Yılmaz', 'Mehmet Öztürk', 'Fatma Kaya', 'Ali Veli', 'Zeynep Demir']; */
 const lessonNames = ['Matematik', 'Fizik', 'Kimya', 'Biyoloji', 'Edebiyat', 'Tarih', 'Coğrafya'];
 
 // Örnek başlangıç verisi
@@ -206,10 +206,26 @@ export default function DersProgramiOgretmenYonetim() {
     const [currentLesson, setCurrentLesson] = useState({ lesson: '', teacher: '' });
     const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' });
     const [classNames, setClassNames] = useState([]);
-
+    const [teachers, setTeachers] = useState([]);
+    const [selectedTeacher, setSelectedTeacher] = useState(''); // Seçilen öğretmen
     // --- RESPONSIVE TASARIM İÇİN HOOK'LAR ---
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+    useEffect(() => {
+        async function fetchTeachers() {
+            try {
+                const res = await axios.get('http://localhost:5000/api/teachers');
+                // Use id and ad from ogretmen table
+                const teacherList = res.data.map(row => ({ id: row.id, name: row.adsoyad }));
+                setTeachers(teacherList);
+                if (teacherList.length > 0 && !selectedTeacher) setSelectedTeacher(teacherList[0].id);
+            } catch (err) {
+                console.error('Öğretmen listesi alınamadı:', err);
+            }
+        }
+        fetchTeachers();
+    }, []);
 
     useEffect(() => {
         async function fetchClasses() {
@@ -253,9 +269,9 @@ export default function DersProgramiOgretmenYonetim() {
             setNotification({ open: true, message: 'Sadece kendi derslerinizi düzenleyebilirsiniz.', severity: 'warning' });
             return;
         }
-        
         setCurrentCell({ day, period });
         setCurrentLesson(lesson || { lesson: '', teacher: '' });
+        setSelectedTeacher(lesson ? lesson.teacher : (teachers[0]?.id || ''));
         setModalOpen(true);
     };
 
@@ -269,7 +285,9 @@ export default function DersProgramiOgretmenYonetim() {
     // Ders kaydetme ve güncelleme
     const handleSaveLesson = () => {
         const { day, period } = currentCell;
-        if (!day || !period || !currentLesson.lesson || !currentLesson.teacher) {
+        // Use selectedTeacher for teacher value
+        const lessonToSave = { ...currentLesson, teacher: selectedTeacher };
+        if (!day || !period || !lessonToSave.lesson || !lessonToSave.teacher) {
             setNotification({ open: true, message: 'Lütfen tüm alanları doldurunuz.', severity: 'error' });
             return;
         }
@@ -280,16 +298,16 @@ export default function DersProgramiOgretmenYonetim() {
             // Sadece başka sınıflarda aynı anda aynı öğretmen var mı kontrol et
             if (className === selectedClass) continue;
             const existingLesson = scheduleData[className]?.[key];
-            if (existingLesson && existingLesson.teacher === currentLesson.teacher) {
+            if (existingLesson && existingLesson.teacher === lessonToSave.teacher) {
                 setNotification({
                     open: true,
-                    message: `Çakışma! ${currentLesson.teacher}, ${className} sınıfında aynı saatte derse giriyor.`,
+                    message: `Çakışma! ${lessonToSave.teacher}, ${className} sınıfında aynı saatte derse giriyor.`,
                     severity: 'error'
                 });
                 return;
             }
         }
-        const updatedClassSchedule = { ...(scheduleData[selectedClass] || {}), [key]: currentLesson };
+        const updatedClassSchedule = { ...(scheduleData[selectedClass] || {}), [key]: lessonToSave };
         setScheduleData({ ...scheduleData, [selectedClass]: updatedClassSchedule });
         
         setNotification({ open: true, message: 'Ders başarıyla kaydedildi!', severity: 'success' });
@@ -499,12 +517,16 @@ export default function DersProgramiOgretmenYonetim() {
                             <InputLabel id="teacher-name-label">Öğretmen</InputLabel>
                             <Select
                                 labelId="teacher-name-label"
-                                value={currentLesson.teacher}
+                                value={selectedTeacher}
                                 label="Öğretmen"
-                                onChange={(e) => setCurrentLesson({ ...currentLesson, teacher: e.target.value })}
+                                onChange={(e) => {
+                                    setSelectedTeacher(e.target.value);
+                                    setCurrentLesson({ ...currentLesson, teacher: e.target.value });
+                                }}
+                                className="select-control"
                             >
-                                {teachers.map(name => (
-                                    <MenuItem key={name} value={name}>{name}</MenuItem>
+                                {teachers.map(tcs => (
+                                    <MenuItem key={tcs.id} value={tcs.name || tcs.id}>{tcs.name}</MenuItem>
                                 ))}
                             </Select>
                         </FormControl>
