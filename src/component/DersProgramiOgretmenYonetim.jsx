@@ -53,7 +53,7 @@ const timeSlots = {
 /* const classNames = ['9/A', '9/B', '10/A', '10/B', '11/A', '11/C']; */
 
 /* const teachers = ['Ayşe Yılmaz', 'Mehmet Öztürk', 'Fatma Kaya', 'Ali Veli', 'Zeynep Demir']; */
-const lessonNames = ['Matematik', 'Fizik', 'Kimya', 'Biyoloji', 'Edebiyat', 'Tarih', 'Coğrafya'];
+/* const lessonNames = ['Matematik', 'Fizik', 'Kimya', 'Biyoloji', 'Edebiyat', 'Tarih', 'Coğrafya']; */
 
 // Örnek başlangıç verisi
 const initialScheduleData = {
@@ -208,9 +208,26 @@ export default function DersProgramiOgretmenYonetim() {
     const [classNames, setClassNames] = useState([]);
     const [teachers, setTeachers] = useState([]);
     const [selectedTeacher, setSelectedTeacher] = useState(''); // Seçilen öğretmen
+    const [lessonNames, setLessonNames] = useState([]); // Ders adları
+    const [selectedLesson, setSelectedLesson] = useState(''); // Seçilen ders adı
     // --- RESPONSIVE TASARIM İÇİN HOOK'LAR ---
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+    useEffect(() => {
+        async function fetchLessons() {
+            try {
+                const res = await axios.get('http://localhost:5000/api/lessons');
+                // Use id and ad from ders table
+                const lessonList = res.data.map(row => ({ id: row.id, name: row.ad }));
+                setLessonNames(lessonList);
+                if (lessonList.length > 0 && !selectedLesson) setSelectedLesson(lessonList[0].id);
+            } catch (err) {
+                console.error('Ders listesi alınamadı:', err);
+            }
+        }
+        fetchLessons();
+    }, []);
 
     useEffect(() => {
         async function fetchTeachers() {
@@ -508,8 +525,8 @@ export default function DersProgramiOgretmenYonetim() {
                                 label="Ders Adı"
                                 onChange={(e) => setCurrentLesson({ ...currentLesson, lesson: e.target.value })}
                             >
-                                {lessonNames.map(name => (
-                                    <MenuItem key={name} value={name}>{name}</MenuItem>
+                                {lessonNames.map(xyz => (
+                                    <MenuItem key={xyz.id} value={xyz.name || xyz.id}>{xyz.name}</MenuItem>
                                 ))}
                             </Select>
                         </FormControl>

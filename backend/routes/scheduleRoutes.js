@@ -68,11 +68,14 @@ router.get('/teachers', async (req, res) => {
 });
 
 // Get all lessons
-router.get('/lessons', (req, res) => {
-  db.query('SELECT * FROM ders', (err, results) => {
-    if (err) return res.status(500).json({ error: err });
+router.get('/lessons', async (req, res) => {
+  try {
+    const [results] = await db.query('SELECT * FROM ders');
     res.json(results);
-  });
+    console.log(results);
+  } catch (err) {
+    return res.status(500).json({ error: err });
+  }
 });
 
 // Get schedule for a class
