@@ -260,6 +260,13 @@ export default function DersProgramiOgretmenYonetim() {
         fetchClasses();
     }, []); // Only run on mount
 
+    // Sınıf select değiştiğinde boşsa ilk sınıfı seçili yap
+    useEffect(() => {
+        if ((!selectedClass || selectedClass === '') && classNames.length > 0) {
+            setSelectedClass(classNames[0].id);
+        }
+    }, [classNames, selectedClass]);
+
     // --- KULLANICI ROLÜNE GÖRE FİLTRELENMİŞ SINIF LİSTESİ ---
     const availableClasses = useMemo(() => {
         if (userRole === 'teacher') {
@@ -278,10 +285,28 @@ export default function DersProgramiOgretmenYonetim() {
     
     // --- EVENT HANDLER'LAR ---
 
+    // Yardımcı fonksiyon: id'den öğretmen adını bul
+    const getTeacherNameById = (id) => {
+        const t = teachers.find(t => t.id === id);
+        return t ? t.name : id;
+    };
+
+    // Yardımcı fonksiyon: id'den sınıf adını bul
+    const getClassNameById = (id) => {
+        const c = classNames.find(c => c.id === id);
+        return c ? c.name : id;
+    };
+
     // Modal'ı açan fonksiyon
     const handleCellClick = (day, period) => {
+        // Sınıf seçilmemişse uyarı ver ve açma
+        if (!selectedClass) {
+            setNotification({ open: true, message: 'Lütfen önce bir sınıf seçin.', severity: 'warning' });
+            return;
+        }
         // Öğretmen rolündeyse ve ders kendisine ait değilse düzenlemeyi engelle
         const lesson = scheduleData[selectedClass]?.[`${day}-${period}`];
+        // lesson.teacher artık id olacak
         if (userRole === 'teacher' && lesson && lesson.teacher !== currentUser) {
             setNotification({ open: true, message: 'Sadece kendi derslerinizi düzenleyebilirsiniz.', severity: 'warning' });
             return;
@@ -301,32 +326,22 @@ export default function DersProgramiOgretmenYonetim() {
 
     // Ders kaydetme ve güncelleme
     const handleSaveLesson = () => {
+        // Sınıf seçilmemişse veya boşsa kaydetme
+        if (!selectedClass || selectedClass === '') {
+            setNotification({ open: true, message: 'Lütfen önce bir sınıf seçin.', severity: 'error' });
+            return;
+        }
         const { day, period } = currentCell;
-        // Use selectedTeacher for teacher value
+        // Use selectedTeacher (id) for teacher value
         const lessonToSave = { ...currentLesson, teacher: selectedTeacher };
         if (!day || !period || !lessonToSave.lesson || !lessonToSave.teacher) {
             setNotification({ open: true, message: 'Lütfen tüm alanları doldurunuz.', severity: 'error' });
             return;
         }
-
-        // Çakışma kontrolü
+        // Çakışma kontrolü kaldırıldı
         const key = `${day}-${period}`;
-        for (const className in scheduleData) {
-            // Sadece başka sınıflarda aynı anda aynı öğretmen var mı kontrol et
-            if (className === selectedClass) continue;
-            const existingLesson = scheduleData[className]?.[key];
-            if (existingLesson && existingLesson.teacher === lessonToSave.teacher) {
-                setNotification({
-                    open: true,
-                    message: `Çakışma! ${lessonToSave.teacher}, ${className} sınıfında aynı saatte derse giriyor.`,
-                    severity: 'error'
-                });
-                return;
-            }
-        }
         const updatedClassSchedule = { ...(scheduleData[selectedClass] || {}), [key]: lessonToSave };
         setScheduleData({ ...scheduleData, [selectedClass]: updatedClassSchedule });
-        
         setNotification({ open: true, message: 'Ders başarıyla kaydedildi!', severity: 'success' });
         handleModalClose();
     };
@@ -335,12 +350,9 @@ export default function DersProgramiOgretmenYonetim() {
     const handleDeleteLesson = () => {
         const { day, period } = currentCell;
         const key = `${day}-${period}`;
-        
         const updatedClassSchedule = { ...(scheduleData[selectedClass] || {}) };
         delete updatedClassSchedule[key];
-        
         setScheduleData({ ...scheduleData, [selectedClass]: updatedClassSchedule });
-        
         setNotification({ open: true, message: 'Ders başarıyla silindi.', severity: 'info' });
         handleModalClose();
     };
@@ -434,17 +446,17 @@ export default function DersProgramiOgretmenYonetim() {
                                     {days.map(day => {
                                         const key = `${day}-${period}`;
                                         const lesson = scheduleData[selectedClass]?.[key];
-                                        const isConflict = !lesson ? false : Object.keys(scheduleData).some(cName => 
-                                            cName !== selectedClass && 
-                                            scheduleData[cName]?.[key]?.teacher === lesson.teacher
-                                        );
-
+                                        // Çakışma kontrolü kaldırıldı
+                                        // const isConflict = !lesson ? false : Object.keys(scheduleData).some(cName => 
+                                        //     cName !== selectedClass && 
+                                        //     scheduleData[cName]?.[key]?.teacher === lesson.teacher
+                                        // );
                                         return (
                                             <TableCell
                                                 key={key}
                                                 align="center"
                                                 onClick={() => handleCellClick(day, period)}
-                                                className={`schedule-cell ${lesson ? 'filled' : 'empty'} ${isConflict ? 'conflict' : ''}`}
+                                                className={`schedule-cell ${lesson ? 'filled' : 'empty'}`}
                                                 sx={{ 
                                                     border: '1px solid #ddd',
                                                     verticalAlign: 'top',
@@ -453,16 +465,15 @@ export default function DersProgramiOgretmenYonetim() {
                                             >
                                                 {lesson ? (
                                                     <Paper 
-                                                        elevation={isConflict ? 6 : 2} 
+                                                        elevation={2} 
                                                         className="lesson-card"
                                                         sx={{
-                                                            bgcolor: isConflict ? '#FFA500' : (lesson.teacher === currentUser ? '#e6f4ea' : '#e3f2fd'),
-                                                            color: isConflict ? '#fff' : 'inherit'
+                                                            bgcolor: (lesson.teacher === currentUser ? '#e6f4ea' : '#e3f2fd'),
+                                                            color: 'inherit'
                                                         }}
                                                     >
                                                         <Typography variant="subtitle2" fontWeight="bold">{lesson.lesson}</Typography>
-                                                        <Typography variant="body2">{lesson.teacher}</Typography>
-                                                        {isConflict && <Typography variant="caption" fontWeight="bold">ÇAKIŞMA!</Typography>}
+                                                        <Typography variant="body2">{getTeacherNameById(lesson.teacher)}</Typography>
                                                     </Paper>
                                                 ) : (
                                                     <Box className="empty-slot-icon">
@@ -487,7 +498,7 @@ export default function DersProgramiOgretmenYonetim() {
                     className="modal-fade"
                 >
                     <DialogTitle>
-                        {currentCell.day && currentCell.period ? `${selectedClass} | ${currentCell.day} - ${currentCell.period}` : 'Yeni Ders Ekle'}
+                        {currentCell.day && currentCell.period ? `${getClassNameById(selectedClass)} | ${currentCell.day} - ${currentCell.period}` : 'Yeni Ders Ekle'}
                         <IconButton
                             aria-label="close"
                             onClick={handleModalClose}
@@ -543,7 +554,7 @@ export default function DersProgramiOgretmenYonetim() {
                                 className="select-control"
                             >
                                 {teachers.map(tcs => (
-                                    <MenuItem key={tcs.id} value={tcs.name || tcs.id}>{tcs.name}</MenuItem>
+                                    <MenuItem key={tcs.id} value={tcs.id}>{tcs.name}</MenuItem>
                                 ))}
                             </Select>
                         </FormControl>
