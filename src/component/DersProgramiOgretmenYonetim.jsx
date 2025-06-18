@@ -312,13 +312,13 @@ export default function DersProgramiOgretmenYonetim() {
     // Yardımcı fonksiyon: id'den öğretmen adını bul
     const getTeacherNameById = (id) => {
         const teacher = teachers.find(t => t.id === id);
-        return teacher ? teacher.adsoyad : '';
+        return teacher ? teacher.name : '';
     };
 
     // Yardımcı fonksiyon: id'den ders adını bul
     const getLessonNameById = (id) => {
         const lesson = lessonNames.find(l => l.id === id);
-        return lesson ? lesson.ad : '';
+        return lesson ? lesson.name : '';
     };
 
     // Yardımcı fonksiyon: id'den sınıf adını bul
@@ -599,10 +599,10 @@ export default function DersProgramiOgretmenYonetim() {
                                                             height: '100%'
                                                         }}
                                                     >
-                                                        <Typography variant="subtitle1" sx={{ fontWeight: 'medium' }}>
+                                                        <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
                                                             {getLessonNameById(scheduleEntry.lesson)}
                                                         </Typography>
-                                                        <Typography variant="body2" color="text.secondary">
+                                                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'medium' }}>
                                                             {getTeacherNameById(scheduleEntry.teacher)}
                                                         </Typography>
                                                     </Paper>
@@ -663,14 +663,17 @@ export default function DersProgramiOgretmenYonetim() {
                          )}
 
                         <FormControl fullWidth margin="normal">
-                            <InputLabel id="lesson-name-label">Ders Adı</InputLabel>                            <Select
+                            <InputLabel id="lesson-name-label">Ders</InputLabel>
+                            <Select
                                 labelId="lesson-name-label"
-                                value={selectedLesson}
-                                label="Ders Adı"
+                                value={selectedLesson || ''}
+                                label="Ders"
                                 onChange={handleLessonChange}
                             >
-                                {lessonNames.map(xyz => (
-                                    <MenuItem key={xyz.id} value={xyz.id}>{xyz.name}</MenuItem>
+                                {lessonNames.map(lesson => (
+                                    <MenuItem key={lesson.id} value={lesson.id}>
+                                        {lesson.name}
+                                    </MenuItem>
                                 ))}
                             </Select>
                         </FormControl>
@@ -678,7 +681,7 @@ export default function DersProgramiOgretmenYonetim() {
                             <InputLabel id="teacher-name-label">Öğretmen</InputLabel>
                             <Select
                                 labelId="teacher-name-label"
-                                value={selectedTeacher}
+                                value={selectedTeacher || ''}
                                 label="Öğretmen"
                                 onChange={(e) => {
                                     setSelectedTeacher(e.target.value);
@@ -686,14 +689,15 @@ export default function DersProgramiOgretmenYonetim() {
                                 }}
                                 className="select-control"
                             >
-                                {teachers.map(tcs => (
-                                    <MenuItem key={tcs.id} value={tcs.id}>{tcs.name}</MenuItem>
+                                {teachers.map(teacher => (
+                                    <MenuItem key={teacher.id} value={teacher.id}>
+                                        {teacher.name}
+                                    </MenuItem>
                                 ))}
                             </Select>
                         </FormControl>
-                    </DialogContent>
-                    <DialogActions sx={{ p: '16px 24px' }}>
-                        {scheduleData[selectedClass]?.[`${currentCell.day}-${currentCell.period}`] && (userRole === 'management' || scheduleData[selectedClass]?.[`${currentCell.day}-${currentCell.period}`]?.teacher === currentUser) && (
+                    </DialogContent>                    <DialogActions sx={{ p: '16px 24px' }}>
+                        {currentCell.day && currentCell.period && scheduleData[`${currentCell.day}-${currentCell.period}`] && (userRole === 'management' || scheduleData[`${currentCell.day}-${currentCell.period}`]?.teacher === currentUser) && (
                             <Button
                                 onClick={handleDeleteLesson}
                                 color="error"
