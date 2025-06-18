@@ -448,27 +448,39 @@ export default function DersProgramiOgretmenYonetim() {
                 severity: 'error'
             });
         }
-    };
-
-    // Ders silme
+    };    // Ders silme
     const handleDeleteLesson = async () => {
         const { day, period } = currentCell;
         
         try {
-            await axios.post('http://localhost:5000/api/schedule/schedule/delete', {
-                classId: selectedClass,
+            const periodNumber = period.split('.')[0]; // Convert "2. Ders" to "2"
+            const key = `${day}-${periodNumber}`;
+            const scheduleEntry = scheduleData[key];
+            
+            if (!scheduleEntry) {
+                console.log('Looking for key:', key);
+                console.log('Available schedule data:', scheduleData);
+                setNotification({
+                    open: true,
+                    message: 'Silinecek ders bulunamadı.',
+                    severity: 'error'
+                });
+                return;
+            }
+
+            // Get the class name for the API call
+            const className = getClassNameById(selectedClass);
+
+            await axios.post('http://localhost:5000/api/schedule/delete', {
+                classId: className,
                 day,
-                period
+                period // Send the full period string like "2. Ders"
             });
 
-            const key = `${day}-${period}`;
-            const updatedClassSchedule = { ...(scheduleData[selectedClass] || {}) };
-            delete updatedClassSchedule[key];
-            
-            setScheduleData(prev => ({
-                ...prev,
-                [selectedClass]: updatedClassSchedule
-            }));
+            // Remove the entry from local state
+            const updatedScheduleData = { ...scheduleData };
+            delete updatedScheduleData[key];
+            setScheduleData(updatedScheduleData);
 
             setNotification({
                 open: true,
@@ -697,7 +709,7 @@ export default function DersProgramiOgretmenYonetim() {
                             </Select>
                         </FormControl>
                     </DialogContent>                    <DialogActions sx={{ p: '16px 24px' }}>
-                        {currentCell.day && currentCell.period && scheduleData[`${currentCell.day}-${currentCell.period}`] && (userRole === 'management' || scheduleData[`${currentCell.day}-${currentCell.period}`]?.teacher === currentUser) && (
+                        
                             <Button
                                 onClick={handleDeleteLesson}
                                 color="error"
@@ -706,7 +718,7 @@ export default function DersProgramiOgretmenYonetim() {
                             >
                                 Sil
                             </Button>
-                        )}
+                        
                         <Box sx={{ flex: '1 0 0' }} />
                         <Button onClick={handleModalClose} color="secondary">İptal</Button>
                         <Button onClick={handleSaveLesson} variant="contained" className="save-button">
