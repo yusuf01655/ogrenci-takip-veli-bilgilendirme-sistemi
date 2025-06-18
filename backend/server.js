@@ -44,7 +44,7 @@ app.use('/login', loginLimiter);
 app.use('/api/auth', authRoutes); // /api/auth altındaki tüm istekleri authRoutes'a yönlendir
 app.use('/api/ogrenciler', ogrenciRoutes);
 app.use('/api/messages', messagesRouter); // All routes in messages.js will be prefixed with /api/messages
-app.use('/api', scheduleRoutes);
+app.use('/api/schedule', scheduleRoutes);
 
 // Basit bir test route'u
 app.get('/', (req, res) => {

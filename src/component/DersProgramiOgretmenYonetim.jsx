@@ -217,84 +217,86 @@ export default function DersProgramiOgretmenYonetim() {
     useEffect(() => {
         async function fetchLessons() {
             try {
-                const res = await axios.get('http://localhost:5000/api/lessons');
-                // Use id and ad from ders table
+                const res = await axios.get('http://localhost:5000/api/schedule/lessons');
                 const lessonList = res.data.map(row => ({ id: row.id, name: row.ad }));
                 setLessonNames(lessonList);
                 if (lessonList.length > 0 && !selectedLesson) setSelectedLesson(lessonList[0].id);
             } catch (err) {
                 console.error('Ders listesi alınamadı:', err);
+                setNotification({
+                    open: true,
+                    message: 'Ders listesi yüklenirken bir hata oluştu.',
+                    severity: 'error'
+                });
             }
         }
         fetchLessons();
-    }, []);
+    }, [selectedLesson]);
 
     useEffect(() => {
         async function fetchTeachers() {
             try {
-                const res = await axios.get('http://localhost:5000/api/teachers');
-                // Use id and ad from ogretmen table
+                const res = await axios.get('http://localhost:5000/api/schedule/teachers');
                 const teacherList = res.data.map(row => ({ id: row.id, name: row.adsoyad }));
                 setTeachers(teacherList);
                 if (teacherList.length > 0 && !selectedTeacher) setSelectedTeacher(teacherList[0].id);
             } catch (err) {
                 console.error('Öğretmen listesi alınamadı:', err);
+                setNotification({
+                    open: true,
+                    message: 'Öğretmen listesi yüklenirken bir hata oluştu.',
+                    severity: 'error'
+                });
             }
         }
         fetchTeachers();
-    }, []);
+    }, [selectedTeacher]);
 
+    // Get all classes
     useEffect(() => {
         async function fetchClasses() {
             try {
-                const res = await axios.get('http://localhost:5000/api/classes');
-                // Use id and ad from sinif table
+                const res = await axios.get('http://localhost:5000/api/schedule/classes');
                 const classList = res.data.map(row => ({ id: row.id, name: row.ad }));
                 setClassNames(classList);
-                // Varsayılan seçili sınıfı ayarla (id olarak)
-                if (classList.length > 0 && !selectedClass) setSelectedClass(classList[0].id);
+                // Set the first class as selected if none is selected
+                if (classList.length > 0 && !selectedClass) {
+                    setSelectedClass(classList[0].id.toString());
+                }
             } catch (err) {
                 console.error('Sınıf listesi alınamadı:', err);
+                setNotification({
+                    open: true,
+                    message: 'Sınıf listesi yüklenirken bir hata oluştu.',
+                    severity: 'error'
+                });
             }
         }
         fetchClasses();
-    }, []); // Only run on mount
-
-    // Sınıf select değiştiğinde boşsa ilk sınıfı seçili yap
-    useEffect(() => {
-        if ((!selectedClass || selectedClass === '') && classNames.length > 0) {
-            setSelectedClass(classNames[0].id);
-        }
-    }, [classNames, selectedClass]);
-
-    // --- KULLANICI ROLÜNE GÖRE FİLTRELENMİŞ SINIF LİSTESİ ---
-    const availableClasses = useMemo(() => {
-        if (userRole === 'teacher') {
-            const teacherClasses = new Set();
-            Object.keys(scheduleData).forEach(classId => {
-                Object.values(scheduleData[classId]).forEach(lesson => {
-                    if (lesson.teacher === currentUser) {
-                        teacherClasses.add(classId);
-                    }
-                });
-            });
-            return Array.from(teacherClasses);
-        }
-        return classNames.map(cls => cls.id);
-    }, [userRole, scheduleData, currentUser, classNames]);
-    
-    // --- EVENT HANDLER'LAR ---
+    }, []);
 
     // Yardımcı fonksiyon: id'den öğretmen adını bul
     const getTeacherNameById = (id) => {
-        const t = teachers.find(t => t.id === id);
-        return t ? t.name : id;
+        const teacher = teachers.find(t => t.id === id);
+        return teacher ? teacher.adsoyad : '';
+    };
+
+    // Yardımcı fonksiyon: id'den ders adını bul
+    const getLessonNameById = (id) => {
+        const lesson = lessonNames.find(l => l.id === id);
+        return lesson ? lesson.ad : '';
     };
 
     // Yardımcı fonksiyon: id'den sınıf adını bul
     const getClassNameById = (id) => {
-        const c = classNames.find(c => c.id === id);
-        return c ? c.name : id;
+        const classObj = classNames.find(c => c.id.toString() === id.toString());
+        return classObj ? classObj.name : '';
+    };
+
+    // Sınıf değişikliği için handler
+    const handleClassChange = (event) => {
+        const newClassId = event.target.value;
+        setSelectedClass(newClassId);
     };
 
     // Modal'ı açan fonksiyon
@@ -304,16 +306,33 @@ export default function DersProgramiOgretmenYonetim() {
             setNotification({ open: true, message: 'Lütfen önce bir sınıf seçin.', severity: 'warning' });
             return;
         }
+
+        const key = `${day}-${period}`;
+        const currentData = scheduleData[selectedClass]?.[key];
+
         // Öğretmen rolündeyse ve ders kendisine ait değilse düzenlemeyi engelle
-        const lesson = scheduleData[selectedClass]?.[`${day}-${period}`];
-        // lesson.teacher artık id olacak
-        if (userRole === 'teacher' && lesson && lesson.teacher !== currentUser) {
-            setNotification({ open: true, message: 'Sadece kendi derslerinizi düzenleyebilirsiniz.', severity: 'warning' });
+        if (userRole === 'teacher' && currentData && currentData.teacher !== currentUser) {
+            setNotification({
+                open: true,
+                message: 'Sadece kendi derslerinizi düzenleyebilirsiniz.',
+                severity: 'warning'
+            });
             return;
         }
+
         setCurrentCell({ day, period });
-        setCurrentLesson(lesson || { lesson: '', teacher: '' });
-        setSelectedTeacher(lesson ? lesson.teacher : (teachers[0]?.id || ''));
+        if (currentData) {
+            setCurrentLesson({
+                lesson: currentData.lessonId,
+                teacher: currentData.teacher
+            });
+            setSelectedTeacher(currentData.teacher);
+            setSelectedLesson(currentData.lessonId);
+        } else {
+            setCurrentLesson({ lesson: '', teacher: '' });
+            setSelectedTeacher(teachers[0]?.id || '');
+            setSelectedLesson(lessonNames[0]?.id || '');
+        }
         setModalOpen(true);
     };
 
@@ -325,36 +344,97 @@ export default function DersProgramiOgretmenYonetim() {
     };
 
     // Ders kaydetme ve güncelleme
-    const handleSaveLesson = () => {
-        // Sınıf seçilmemişse veya boşsa kaydetme
-        if (!selectedClass || selectedClass === '') {
-            setNotification({ open: true, message: 'Lütfen önce bir sınıf seçin.', severity: 'error' });
+    const handleSaveLesson = async () => {
+        if (!selectedClass || !selectedTeacher || !selectedLesson) {
+            setNotification({
+                open: true,
+                message: 'Lütfen tüm alanları doldurunuz.',
+                severity: 'error'
+            });
             return;
         }
+
         const { day, period } = currentCell;
-        // Use selectedTeacher (id) for teacher value
-        const lessonToSave = { ...currentLesson, teacher: selectedTeacher };
-        if (!day || !period || !lessonToSave.lesson || !lessonToSave.teacher) {
-            setNotification({ open: true, message: 'Lütfen tüm alanları doldurunuz.', severity: 'error' });
-            return;
+        
+        try {
+            // Get the actual class name for the selected class ID
+            const className = getClassNameById(selectedClass);
+            
+            await axios.post('http://localhost:5000/api/schedule/save', {
+                classId: className, // Send the class name instead of ID
+                day,
+                period,
+                lessonId: selectedLesson,
+                teacherId: selectedTeacher
+            });
+
+            // Update local state
+            const key = `${day}-${period}`;
+            const updatedClassSchedule = {
+                ...(scheduleData[selectedClass] || {}),
+                [key]: {
+                    lesson: getLessonNameById(selectedLesson),
+                    lessonId: selectedLesson,
+                    teacher: selectedTeacher,
+                    teacherName: getTeacherNameById(selectedTeacher)
+                }
+            };
+
+            setScheduleData(prev => ({
+                ...prev,
+                [selectedClass]: updatedClassSchedule
+            }));
+
+            setNotification({
+                open: true,
+                message: 'Ders başarıyla kaydedildi!',
+                severity: 'success'
+            });
+            handleModalClose();
+        } catch (err) {
+            console.error('Ders kaydedilemedi:', err);
+            setNotification({
+                open: true,
+                message: 'Ders kaydedilirken bir hata oluştu.',
+                severity: 'error'
+            });
         }
-        // Çakışma kontrolü kaldırıldı
-        const key = `${day}-${period}`;
-        const updatedClassSchedule = { ...(scheduleData[selectedClass] || {}), [key]: lessonToSave };
-        setScheduleData({ ...scheduleData, [selectedClass]: updatedClassSchedule });
-        setNotification({ open: true, message: 'Ders başarıyla kaydedildi!', severity: 'success' });
-        handleModalClose();
     };
 
     // Ders silme
-    const handleDeleteLesson = () => {
+    const handleDeleteLesson = async () => {
         const { day, period } = currentCell;
-        const key = `${day}-${period}`;
-        const updatedClassSchedule = { ...(scheduleData[selectedClass] || {}) };
-        delete updatedClassSchedule[key];
-        setScheduleData({ ...scheduleData, [selectedClass]: updatedClassSchedule });
-        setNotification({ open: true, message: 'Ders başarıyla silindi.', severity: 'info' });
-        handleModalClose();
+        
+        try {
+            await axios.post('http://localhost:5000/api/schedule/schedule/delete', {
+                classId: selectedClass,
+                day,
+                period
+            });
+
+            const key = `${day}-${period}`;
+            const updatedClassSchedule = { ...(scheduleData[selectedClass] || {}) };
+            delete updatedClassSchedule[key];
+            
+            setScheduleData(prev => ({
+                ...prev,
+                [selectedClass]: updatedClassSchedule
+            }));
+
+            setNotification({
+                open: true,
+                message: 'Ders başarıyla silindi.',
+                severity: 'success'
+            });
+            handleModalClose();
+        } catch (err) {
+            console.error('Ders silinemedi:', err);
+            setNotification({
+                open: true,
+                message: 'Ders silinirken bir hata oluştu.',
+                severity: 'error'
+            });
+        }
     };
 
     // Bildirim kapatma
@@ -402,13 +482,15 @@ export default function DersProgramiOgretmenYonetim() {
                         <InputLabel id="class-select-label">Sınıf Seç</InputLabel>
                         <Select
                             labelId="class-select-label"
-                            value={selectedClass}
+                            value={selectedClass || ''}
                             label="Sınıf Seç"
-                            onChange={(e) => setSelectedClass(e.target.value)}
+                            onChange={handleClassChange}
                             className="select-control"
                         >
                             {classNames.map(cls => (
-                                <MenuItem key={cls.id} value={cls.id}>{cls.name}</MenuItem>
+                                <MenuItem key={cls.id} value={cls.id.toString()}>
+                                    {cls.name}
+                                </MenuItem>
                             ))}
                         </Select>
                     </FormControl>
