@@ -79,6 +79,21 @@ router.get('/schedule/:classId', async (req, res) => {
   }
 });
 
+// Get schedule for a class by ID
+router.get('/class/:classId', async (req, res) => {
+    try {
+        const { classId } = req.params;
+        const [results] = await db.query(
+            'SELECT * FROM ders_programi WHERE sinif_id = ?',
+            [classId]
+        );
+        res.json(results);
+    } catch (err) {
+        console.error('Error fetching class schedule:', err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Add or update a schedule entry
 router.post('/save', async (req, res) => {
   try {

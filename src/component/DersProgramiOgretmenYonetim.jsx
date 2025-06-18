@@ -199,8 +199,8 @@ export default function DersProgramiOgretmenYonetim() {
     // --- STATE'LER ---
     const [userRole, setUserRole] = useState('management'); // 'management' veya 'teacher'
     const [currentUser] = useState('Mehmet Öztürk'); // Simülasyon için mevcut öğretmen
-    const [selectedClass, setSelectedClass] = useState('10/A');
-    const [scheduleData, setScheduleData] = useState(initialScheduleData);
+    const [selectedClass, setSelectedClass] = useState('1');
+    const [scheduleData, setScheduleData] = useState({});
     const [modalOpen, setModalOpen] = useState(false);
     const [currentCell, setCurrentCell] = useState({ day: null, period: null });
     const [currentLesson, setCurrentLesson] = useState({ lesson: '', teacher: '' });
@@ -275,6 +275,40 @@ export default function DersProgramiOgretmenYonetim() {
         fetchClasses();
     }, []);
 
+    // Fetch schedule data when selected class changes
+    useEffect(() => {
+        async function fetchScheduleData() {
+            if (!selectedClass) return;
+            
+            try {
+                const res = await axios.get(`http://localhost:5000/api/schedule/class/${selectedClass}`);
+                const scheduleFromDB = res.data;
+                
+                // Convert the database format to our component's format
+                const formattedSchedule = {};
+                scheduleFromDB.forEach(entry => {
+                    const key = `${entry.gun}-${entry.saat.split('.')[0]}`; // Convert "2. Ders" to "2"
+                    formattedSchedule[key] = {
+                        lesson: entry.ders_id,
+                        teacher: entry.ogretmen_id,
+                        scheduleId: entry.id // Store the schedule entry ID for updates
+                    };
+                });
+                
+                setScheduleData(formattedSchedule);
+            } catch (err) {
+                console.error('Ders programı alınamadı:', err);
+                setNotification({
+                    open: true,
+                    message: 'Ders programı yüklenirken bir hata oluştu.',
+                    severity: 'error'
+                });
+            }
+        }
+        
+        fetchScheduleData();
+    }, [selectedClass]);
+
     // Yardımcı fonksiyon: id'den öğretmen adını bul
     const getTeacherNameById = (id) => {
         const teacher = teachers.find(t => t.id === id);
@@ -297,6 +331,13 @@ export default function DersProgramiOgretmenYonetim() {
     const handleClassChange = (event) => {
         const newClassId = event.target.value;
         setSelectedClass(newClassId);
+    };
+
+    // Ders değişikliği için handler
+    const handleLessonChange = (event) => {
+        const newLessonId = event.target.value;
+        console.log('Selected lesson changed to:', newLessonId);
+        setSelectedLesson(newLessonId);
     };
 
     // Modal'ı açan fonksiyon
@@ -360,8 +401,16 @@ export default function DersProgramiOgretmenYonetim() {
             // Get the actual class name for the selected class ID
             const className = getClassNameById(selectedClass);
             
+            console.log('Saving lesson with data:', {
+                classId: className,
+                day,
+                period,
+                lessonId: selectedLesson,
+                teacherId: selectedTeacher
+            });
+            
             await axios.post('http://localhost:5000/api/schedule/save', {
-                classId: className, // Send the class name instead of ID
+                classId: className,
                 day,
                 period,
                 lessonId: selectedLesson,
@@ -526,41 +575,44 @@ export default function DersProgramiOgretmenYonetim() {
                                         <Typography variant="body2" color="text.secondary">{timeSlots[period]}</Typography>
                                     </TableCell>
                                     {days.map(day => {
-                                        const key = `${day}-${period}`;
-                                        const lesson = scheduleData[selectedClass]?.[key];
-                                        // Çakışma kontrolü kaldırıldı
-                                        // const isConflict = !lesson ? false : Object.keys(scheduleData).some(cName => 
-                                        //     cName !== selectedClass && 
-                                        //     scheduleData[cName]?.[key]?.teacher === lesson.teacher
-                                        // );
+                                        const key = `${day}-${period.split('.')[0]}`; // Convert "2. Ders" to "2"
+                                        const scheduleEntry = scheduleData[key];
+                                        
                                         return (
                                             <TableCell
                                                 key={key}
                                                 align="center"
                                                 onClick={() => handleCellClick(day, period)}
-                                                className={`schedule-cell ${lesson ? 'filled' : 'empty'}`}
+                                                className={`schedule-cell ${scheduleEntry ? 'filled' : 'empty'}`}
                                                 sx={{ 
                                                     border: '1px solid #ddd',
                                                     verticalAlign: 'top',
                                                     height: isMobile ? '80px' : '100px'
                                                 }}
                                             >
-                                                {lesson ? (
+                                                {scheduleEntry ? (
                                                     <Paper 
                                                         elevation={2} 
                                                         className="lesson-card"
-                                                        sx={{
-                                                            bgcolor: (lesson.teacher === currentUser ? '#e6f4ea' : '#e3f2fd'),
-                                                            color: 'inherit'
+                                                        sx={{ 
+                                                            bgcolor: userRole === 'teacher' && scheduleEntry.teacher === currentUser ? '#e6f4ea' : '#e3f2fd',
+                                                            height: '100%'
                                                         }}
                                                     >
-                                                        <Typography variant="subtitle2" fontWeight="bold">{lesson.lesson}</Typography>
-                                                        <Typography variant="body2">{getTeacherNameById(lesson.teacher)}</Typography>
+                                                        <Typography variant="subtitle1" sx={{ fontWeight: 'medium' }}>
+                                                            {getLessonNameById(scheduleEntry.lesson)}
+                                                        </Typography>
+                                                        <Typography variant="body2" color="text.secondary">
+                                                            {getTeacherNameById(scheduleEntry.teacher)}
+                                                        </Typography>
                                                     </Paper>
                                                 ) : (
-                                                    <Box className="empty-slot-icon">
-                                                        <AddCircleOutlineIcon color="disabled" />
-                                                    </Box>
+                                                    <IconButton 
+                                                        className="empty-slot-icon"
+                                                        sx={{ opacity: 0.5 }}
+                                                    >
+                                                        <AddCircleOutlineIcon />
+                                                    </IconButton>
                                                 )}
                                             </TableCell>
                                         );
@@ -611,15 +663,14 @@ export default function DersProgramiOgretmenYonetim() {
                          )}
 
                         <FormControl fullWidth margin="normal">
-                            <InputLabel id="lesson-name-label">Ders Adı</InputLabel>
-                            <Select
+                            <InputLabel id="lesson-name-label">Ders Adı</InputLabel>                            <Select
                                 labelId="lesson-name-label"
-                                value={currentLesson.lesson}
+                                value={selectedLesson}
                                 label="Ders Adı"
-                                onChange={(e) => setCurrentLesson({ ...currentLesson, lesson: e.target.value })}
+                                onChange={handleLessonChange}
                             >
                                 {lessonNames.map(xyz => (
-                                    <MenuItem key={xyz.id} value={xyz.name || xyz.id}>{xyz.name}</MenuItem>
+                                    <MenuItem key={xyz.id} value={xyz.id}>{xyz.name}</MenuItem>
                                 ))}
                             </Select>
                         </FormControl>
