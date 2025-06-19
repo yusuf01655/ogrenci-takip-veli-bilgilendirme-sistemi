@@ -212,7 +212,7 @@ function DevamsizlikPage() {
     const handleDeleteAbsence = async (id) => {
         if (window.confirm('Bu devamsızlık kaydını silmek istediğinizden emin misiniz?')) {
             try {
-                await axios.delete(`${API_BASE_URL}/devamsizliklar/${id}`);
+                await axios.delete(`${API_BASE_URL}/devamsizlik/devamsizliklar/${id}`);
                 // Lokal state'i güncelleyerek anında yansıt
                 setDevamsizliklar(prev => prev.filter(d => d.id !== id));
             } catch (err) {

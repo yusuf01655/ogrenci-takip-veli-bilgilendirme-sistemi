@@ -35,7 +35,7 @@ router.post('/devamsizliklar', async (req, res) => {
     const { ogrenci_id, devamsizlik_tarihi, devamsizlik_turu, aciklama } = req.body;
     try {
         const [result] = await db.query(
-            "INSERT INTO devamsizliklar (ogrenci_id, devamsizlik_tarihi, devamsizlik_turu, aciklama) VALUES (?, ?, ?, ?)",
+            "INSERT INTO devamsizlik (ogrenci_id, devamsizlik_tarihi, devamsizlik_turu, aciklama) VALUES (?, ?, ?, ?)",
             [ogrenci_id, devamsizlik_tarihi, devamsizlik_turu, aciklama]
         );
         res.status(201).json({ id: result.insertId, message: 'Devamsızlık başarıyla eklendi.' });
@@ -65,7 +65,7 @@ router.put('/devamsizliklar/:id', async (req, res) => {
 router.delete('/devamsizliklar/:id', async (req, res) => {
     const { id } = req.params;
     try {
-        await db.query("DELETE FROM devamsizliklar WHERE id = ?", [id]);
+        await db.query("DELETE FROM devamsizlik WHERE id = ?", [id]);
         res.json({ message: 'Devamsızlık başarıyla silindi.' });
     } catch (error) {
         console.error("Devamsızlık silinirken hata:", error);
