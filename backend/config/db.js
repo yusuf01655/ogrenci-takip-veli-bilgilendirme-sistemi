@@ -16,6 +16,8 @@ const pool = mysql.createPool({
 pool.getConnection()
   .then(connection => {
     console.log('MySQL veritabanına başarıyla bağlanıldı.');
+    console.log('Connecting to database:', process.env.DB_NAME || 'xd');
+    console.log('Host:', process.env.DB_HOST || 'localhost');
     connection.release();
   })
   .catch(err => {

@@ -1,0 +1,62 @@
+/* Genel Geçiş Efektleri */
+body {
+    transition: background-color 0.5s ease;
+}
+
+/* Animasyonlar */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* Liste Elemanı Hover Efekti */
+.list-item-hover {
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.list-item-hover:hover {
+    background-color: #e9ecef; /* Açık gri tonu */
+    transform: translateX(4px);
+}
+
+/* Tablo Satırı Hover Efekti */
+.table-row-hover {
+    transition: background-color 0.3s ease;
+}
+
+.table-row-hover:hover {
+    background-color: #f8f9fa; /* Çok açık gri */
+}
+
+/* Devamsızlık Türü için Stil Etiketleri */
+.status-chip {
+    padding: 4px 10px;
+    border-radius: 16px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #fff;
+    display: inline-block;
+}
+
+.status-excused {
+    background-color: #28a745; /* Yeşil (Özürlü) */
+}
+
+.status-unexcused {
+    background-color: #FFA500; /* Turuncu (Özürsüz) */
+}
+
+/* Genel Sayfa Geçişi Yumuşatma */
+.page-container {
+    transition: opacity 0.5s ease-in-out;
+}

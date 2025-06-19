@@ -12,6 +12,7 @@ import RegisterPage from './pages/RegisterPage';
 import OgrenciIslemleri from './component/OgrenciIslemleri';
 import MesajIslemi from './component/MesajIslemi';
 import DersProgramiOgretmenYonetim from './component/DersProgramiOgretmenYonetim';
+import DevamsizlikPage from './component/DevamsizlikPage';
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userType, setUserType] = useState(null);
@@ -88,6 +89,7 @@ function App() {
             <Route path="/ogrenciler" element={<OgrenciIslemleri />} />
             <Route path="/mesajlar" element={<MesajIslemi />} />
             <Route path="/dersprogrami" element={<DersProgramiOgretmenYonetim />} />
+            <Route path="/devamsizlik" element={<DevamsizlikPage />} />
           </>
         )}
       </Routes>

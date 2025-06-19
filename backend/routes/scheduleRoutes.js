@@ -7,6 +7,8 @@ router.get('/lessons', async (req, res) => {
   try {
     const [results] = await db.query('SELECT * FROM ders');
     res.json(results);
+    console.log(results);
+    
   } catch (err) {
     console.error('Error fetching lessons:', err);
     res.status(500).json({ error: err.message });
