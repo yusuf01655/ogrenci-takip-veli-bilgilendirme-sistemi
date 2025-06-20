@@ -123,7 +123,7 @@ function YoneticiAnasayfa() {
           { text: 'Veli İşlemleri', icon: <SupervisorAccountIcon />, path: '/veliler' },
           { text: 'Ders Programı', icon: <CalendarTodayIcon />, path: '/dersprogrami' },
           { text: 'Devamsızlık İşlemleri', icon: <CheckCircleOutlineIcon />, path: '/devamsizlik' },
-          { text: 'Not İşlemleri', icon: <AssignmentIcon />, path: '/notlar' },
+          { text: 'Not İşlemleri', icon: <AssignmentIcon />, path: '/notlandirma' },
           { text: 'Duyurular', icon: <CampaignIcon />, path: '/duyurular' },
           { text: 'Raporlar', icon: <AssessmentIcon />, path: '/raporlar' },
           { text: 'Mesaj işlemleri', icon: <MessageIcon />, path: '/mesajlar' },
@@ -294,7 +294,7 @@ function YoneticiAnasayfa() {
             {/* Hızlı Eylem Butonları */}
             <Grid item xs={12}>
               <Paper sx={{ p: 2, display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-                 <Button variant="contained" startIcon={<AddIcon />} className="quick-action-button" href="/ogrenciler/ekle">
+                 <Button variant="contained" startIcon={<AddIcon />} className="quick-action-button" href="/ogrenciler">
                   Yeni Öğrenci
                 </Button>
                  <Button variant="contained" color="secondary" startIcon={<AddIcon />} className="quick-action-button" href="/ogretmenler/ekle">

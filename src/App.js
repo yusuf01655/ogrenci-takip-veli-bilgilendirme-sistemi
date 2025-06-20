@@ -13,6 +13,7 @@ import OgrenciIslemleri from './component/OgrenciIslemleri';
 import MesajIslemi from './component/MesajIslemi';
 import DersProgramiOgretmenYonetim from './component/DersProgramiOgretmenYonetim';
 import DevamsizlikPage from './component/DevamsizlikPage';
+import Notlandirma from './component/Notlandirma';
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userType, setUserType] = useState(null);
@@ -90,6 +91,7 @@ function App() {
             <Route path="/mesajlar" element={<MesajIslemi />} />
             <Route path="/dersprogrami" element={<DersProgramiOgretmenYonetim />} />
             <Route path="/devamsizlik" element={<DevamsizlikPage />} />
+            <Route path="/notlandirma" element={<Notlandirma />} />
           </>
         )}
       </Routes>

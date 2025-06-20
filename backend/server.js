@@ -12,7 +12,7 @@ const ogrenciRoutes = require('./routes/ogrenciRoutes');
 const messagesRouter = require('./routes/messages'); // Adjust path as needed
 const scheduleRoutes = require('./routes/scheduleRoutes');
 const devamsizlikRoutes = require('./routes/devamsizlikRoutes'); // Devamsızlık ile ilgili rotalar
-
+const notlandirmaRoutes = require('./routes/notlandirmaRoutes'); // Notlandırma ile ilgili rotalar
 const app = express();
 
 // --- Güvenlik Middleware'leri ---
@@ -47,6 +47,7 @@ app.use('/api/ogrenciler', ogrenciRoutes);
 app.use('/api/messages', messagesRouter); // All routes in messages.js will be prefixed with /api/messages
 app.use('/api/schedule', scheduleRoutes);
 app.use('/api/devamsizlik', devamsizlikRoutes); // Devamsızlık ile ilgili rotalar
+app.use('/api/notlandirma', notlandirmaRoutes);
 // Basit bir test route'u
 app.get('/', (req, res) => {
     res.send('Öğrenci Takip Sistemi Backend Çalışıyor!');
