@@ -135,8 +135,18 @@ router.post('/save', async (req, res) => {
         [sinifId, day, period, lessonId, teacherId]
       );
     }
-    
-    res.json({ message: 'Schedule updated successfully' });
+    // Bildirim ekle
+    const notificationSql = `
+      INSERT INTO bildirim (bildirim_icerigi, bildirim_turu_id, ogrenci_id)
+      VALUES (?, ?, ?);
+    `;
+    const notificationContent = `Ders programınız güncellendi: Sınıf ${classId}, Gün: ${day}, Saat: ${period}`;
+    // Sınıftaki tüm öğrenciler için bildirim ekle
+    const [students] = await db.query('SELECT id FROM ogrenci WHERE sinif_id = ?', [sinifId]);
+    for (const student of students) {
+      await db.query(notificationSql, [notificationContent, 3, student.id]);
+    }
+    res.json({ message: 'Schedule updated successfully ve bildirimler oluşturuldu' });
   } catch (error) {
     console.error('Error saving schedule:', error);
     res.status(500).json({ message: 'Error saving schedule' });
@@ -164,7 +174,18 @@ router.post('/delete', async (req, res) => {
       'DELETE FROM ders_programi WHERE sinif_id = ? AND gun = ? AND saat = ?',
       [sinifId, day, period]
     );
-    res.json({ message: 'Schedule entry deleted successfully' });
+    // Bildirim ekle
+    const notificationSql = `
+      INSERT INTO bildirim (bildirim_icerigi, bildirim_turu_id, ogrenci_id)
+      VALUES (?, ?, ?);
+    `;
+    const notificationContent = `Ders programınızdan bir kayıt silindi: Sınıf ${classId}, Gün: ${day}, Saat: ${period}`;
+    // Sınıftaki tüm öğrenciler için bildirim ekle
+    const [students] = await db.query('SELECT id FROM ogrenci WHERE sinif_id = ?', [sinifId]);
+    for (const student of students) {
+      await db.query(notificationSql, [notificationContent, 3, student.id]);
+    }
+    res.json({ message: 'Schedule entry deleted successfully ve bildirimler oluşturuldu' });
   } catch (error) {
     console.error('Error deleting schedule:', error);
     res.status(500).json({ message: 'Error deleting schedule' });

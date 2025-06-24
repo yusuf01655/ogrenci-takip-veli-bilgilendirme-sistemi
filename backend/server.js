@@ -241,6 +241,14 @@ app.post('/api/messages/send', async (req, res) => {
 
       console.log('Mesaj başarıyla eklendi. Insert ID:', result.insertId);
 
+      // Bildirim ekle
+      const notificationSql = `
+          INSERT INTO bildirim (bildirim_icerigi, bildirim_turu_id, ogrenci_id)
+          VALUES (?, ?, ?);
+      `;
+      const notificationContent = `Yeni bir mesajınız var: Konu '${subject}'`;
+      await connection.query(notificationSql, [notificationContent, 4, recipientId]);
+
       // Başarılı yanıt gönder
       res.status(201).json({ success: true, message: 'Mesaj başarıyla gönderildi!', messageId: result.insertId });
 

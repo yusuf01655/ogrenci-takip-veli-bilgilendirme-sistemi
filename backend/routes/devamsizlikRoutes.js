@@ -38,7 +38,14 @@ router.post('/devamsizliklar', async (req, res) => {
             "INSERT INTO devamsizlik (ogrenci_id, devamsizlik_tarihi, devamsizlik_turu, aciklama) VALUES (?, ?, ?, ?)",
             [ogrenci_id, devamsizlik_tarihi, devamsizlik_turu, aciklama]
         );
-        res.status(201).json({ id: result.insertId, message: 'Devamsızlık başarıyla eklendi.' });
+        // Bildirim ekle
+        const notificationSql = `
+            INSERT INTO bildirim (bildirim_icerigi, bildirim_turu_id, ogrenci_id)
+            VALUES (?, ?, ?);
+        `;
+        const notificationContent = `Yeni devamsızlık eklendi: Tarih ${devamsizlik_tarihi}, Tür: ${devamsizlik_turu}`;
+        await db.query(notificationSql, [notificationContent, 2, ogrenci_id]);
+        res.status(201).json({ id: result.insertId, message: 'Devamsızlık başarıyla eklendi ve bildirim oluşturuldu.' });
     } catch (error) {
         console.error("Devamsızlık eklenirken hata:", error);
         res.status(500).json({ message: 'Sunucu hatası: Devamsızlık eklenemedi.' });
@@ -54,7 +61,18 @@ router.put('/devamsizliklar/:id', async (req, res) => {
             "UPDATE devamsizlik SET devamsizlik_tarihi = ?, devamsizlik_turu = ?, aciklama = ? WHERE id = ?",
             [devamsizlik_tarihi, devamsizlik_turu, aciklama, id]
         );
-        res.json({ message: 'Devamsızlık başarıyla güncellendi.' });
+        // Bildirim için önce ogrenci_id alınmalı
+        const [rows] = await db.query('SELECT ogrenci_id FROM devamsizlik WHERE id = ?', [id]);
+        if (rows.length > 0) {
+            const ogrenci_id = rows[0].ogrenci_id;
+            const notificationSql = `
+                INSERT INTO bildirim (bildirim_icerigi, bildirim_turu_id, ogrenci_id)
+                VALUES (?, ?, ?);
+            `;
+            const notificationContent = `Devamsızlık güncellendi: Tarih ${devamsizlik_tarihi}, Tür: ${devamsizlik_turu}`;
+            await db.query(notificationSql, [notificationContent, 2, ogrenci_id]);
+        }
+        res.json({ message: 'Devamsızlık başarıyla güncellendi ve bildirim oluşturuldu.' });
     } catch (error) {
         console.error("Devamsızlık güncellenirken hata:", error);
         res.status(500).json({ message: 'Sunucu hatası: Devamsızlık güncellenemedi.' });
@@ -65,8 +83,22 @@ router.put('/devamsizliklar/:id', async (req, res) => {
 router.delete('/devamsizliklar/:id', async (req, res) => {
     const { id } = req.params;
     try {
+        // Bildirim için önce ogrenci_id alınmalı
+        const [rows] = await db.query('SELECT ogrenci_id FROM devamsizlik WHERE id = ?', [id]);
+        let ogrenci_id = null;
+        if (rows.length > 0) {
+            ogrenci_id = rows[0].ogrenci_id;
+        }
         await db.query("DELETE FROM devamsizlik WHERE id = ?", [id]);
-        res.json({ message: 'Devamsızlık başarıyla silindi.' });
+        if (ogrenci_id) {
+            const notificationSql = `
+                INSERT INTO bildirim (bildirim_icerigi, bildirim_turu_id, ogrenci_id)
+                VALUES (?, ?, ?);
+            `;
+            const notificationContent = `Devamsızlık kaydınız silindi.`;
+            await db.query(notificationSql, [notificationContent, 2, ogrenci_id]);
+        }
+        res.json({ message: 'Devamsızlık başarıyla silindi ve bildirim oluşturuldu.' });
     } catch (error) {
         console.error("Devamsızlık silinirken hata:", error);
         res.status(500).json({ message: 'Sunucu hatası: Devamsızlık silinemedi.' });
