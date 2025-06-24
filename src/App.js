@@ -14,6 +14,8 @@ import MesajIslemi from './component/MesajIslemi';
 import DersProgramiOgretmenYonetim from './component/DersProgramiOgretmenYonetim';
 import DevamsizlikPage from './component/DevamsizlikPage';
 import Notlandirma from './component/Notlandirma';
+import OgrenciAnasayfa from './component/OgrenciAnasayfa'; // Öğrenci için Anasayfa bileşeni
+import OgrenciBildirim from './component/OgrenciBildirim'; // Öğrenci bildirim bileşeni
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userType, setUserType] = useState(null);
@@ -70,6 +72,7 @@ function App() {
   if (userType === 'veli') HomePageComponent = VeliAnasayfa;
   else if (userType === 'yonetici') HomePageComponent = YonetimAnasayfa;
   else if (userType === 'ogretmen') HomePageComponent = OgretmenAnasayfa;
+  else if (userType === 'ogrenci') HomePageComponent = OgrenciAnasayfa;
   console.log('userType: ' + userType);
   return (
     <ThemeProvider theme={theme}>
@@ -92,6 +95,7 @@ function App() {
             <Route path="/dersprogrami" element={<DersProgramiOgretmenYonetim />} />
             <Route path="/devamsizlik" element={<DevamsizlikPage />} />
             <Route path="/notlandirma" element={<Notlandirma />} />
+            <Route path='/bildirimler' element={<OgrenciBildirim />} />
           </>
         )}
       </Routes>
