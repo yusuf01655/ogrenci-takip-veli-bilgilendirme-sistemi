@@ -173,6 +173,36 @@ const Notlandirma = () => {
             o.okul_no.includes(aramaMetni)
         ), [ogrencilerVeNotlar, aramaMetni]
     );
+    const convertToCSV = (data) => {
+    const headers = ['Okul No', 'Ad Soyad', '1. Sınav', '2. Sınav', 'Ortalama', 'Durum'];
+    const rows = data.map(o => {
+        const ort = ortalamaHesapla(o.sinav1, o.sinav2);
+        const durum = durumBelirle(ort);
+        return [
+            o.okul_no,
+            `${o.ad} ${o.soyad}`,
+            o.sinav1 ?? '',
+            o.sinav2 ?? '',
+            ort,
+            durum
+        ].join(',');
+    });
+
+    return [headers.join(','), ...rows].join('\n');
+};
+const handleDownloadReport = () => {
+    const csv = convertToCSV(filtrelenmisOgrenciler); // filtrelenmiş listeyi indir
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'notlandirma_raporu.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+};
+
 
     return (
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }} className="notlandirma-container">
@@ -272,8 +302,9 @@ const Notlandirma = () => {
                     sx={{ backgroundColor: '#28A745', '&:hover': { backgroundColor: '#218838' } }}
                     disabled={ogrencilerVeNotlar.length === 0}
                     className="action-button"
+                    onClick={handleDownloadReport}
                  >
-                    Raporu İndir (PDF)
+                    Raporu İndir
                  </Button>
             </Box>
 

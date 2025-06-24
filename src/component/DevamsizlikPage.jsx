@@ -220,6 +220,33 @@ function DevamsizlikPage() {
             }
         }
     };
+    const convertAbsencesToCSV = (absences) => {
+    const headers = ['Tarih', 'Türü', 'Açıklama'];
+    const rows = absences.map((d) => [
+        new Date(d.devamsizlik_tarihi).toLocaleDateString('tr-TR'),
+        d.devamsizlik_turu,
+        d.aciklama ? `"${d.aciklama.replace(/"/g, '""')}"` : ''
+    ]);
+    const csvContent = [headers, ...rows].map(e => e.join(',')).join('\n');
+    return csvContent;
+};
+    const handleDownloadReport = () => {
+    if (!secilenOgrenci || devamsizliklar.length === 0) return;
+
+    const csv = convertAbsencesToCSV(devamsizliklar);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    const filename = `devamsizlik_${secilenOgrenci.ad}_${secilenOgrenci.soyad}.csv`;
+    link.href = url;
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+};
+
+
 
 
     return (
@@ -346,8 +373,8 @@ function DevamsizlikPage() {
                                         </TableContainer>
                                     )}
                                      <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
-                                        <Button variant="outlined" startIcon={<Download />}>
-                                            Raporu İndir (PDF)
+                                        <Button variant="outlined" startIcon={<Download />} onClick={handleDownloadReport}>
+                                            Raporu İndir
                                         </Button>
                                     </Box>
                                 </Paper>
