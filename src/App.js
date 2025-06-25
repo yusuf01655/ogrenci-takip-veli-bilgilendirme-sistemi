@@ -17,6 +17,7 @@ import Notlandirma from './component/Notlandirma';
 import OgrenciAnasayfa from './component/OgrenciAnasayfa'; // Öğrenci için Anasayfa bileşeni
 import OgrenciBildirim from './component/OgrenciBildirim'; // Öğrenci bildirim bileşeni
 import OgrenciDevamsizlik from './component/OgrenciDevamsizlik'; // Öğrenci devamsızlık bileşeni
+import OgrenciNotlari from './component/OgrenciNotlari'; // Öğrenci notları bileşeni
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userType, setUserType] = useState(null);
@@ -98,6 +99,7 @@ function App() {
             <Route path="/notlandirma" element={<Notlandirma />} />
             <Route path='/bildirimler' element={<OgrenciBildirim />} />
             <Route path='/ogrencidevamsizlik' element={<OgrenciDevamsizlik />} />
+            <Route path='/ogrencisinavnotu' element={<OgrenciNotlari />} />
           </>
         )}
       </Routes>

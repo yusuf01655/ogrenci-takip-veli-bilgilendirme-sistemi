@@ -15,6 +15,7 @@ const devamsizlikRoutes = require('./routes/devamsizlikRoutes'); // Devamsızlı
 const notlandirmaRoutes = require('./routes/notlandirmaRoutes'); // Notlandırma ile ilgili rotalar
 const ogrenciBildirimRoutes = require('./routes/ogrenciBildirimRoutes'); // Öğrenci bildirim rotaları
 const ogrenciDevamsizlikRoutes = require('./routes/ogrenciDevamsizlikRoutes'); // Öğrenci devamsızlık rotaları
+const ogrenciNotlarindanRoutes = require('./routes/ogrenciNotlarindanRoutes'); // Öğrenci notlarından rotalar
 const app = express();
 
 // --- Güvenlik Middleware'leri ---
@@ -52,6 +53,7 @@ app.use('/api/devamsizlik', devamsizlikRoutes); // Devamsızlık ile ilgili rota
 app.use('/api/notlandirma', notlandirmaRoutes);
 app.use('/api/ogrencibildirim', ogrenciBildirimRoutes); // Öğrenci bildirim rotaları
 app.use('/api/ogrencidevamsizliklari',ogrenciDevamsizlikRoutes); // Öğrenci devamsızlık rotaları
+app.use('/api/ogrencinotlarindan',ogrenciNotlarindanRoutes);
 
 // Basit bir test route'u
 app.get('/', (req, res) => {
