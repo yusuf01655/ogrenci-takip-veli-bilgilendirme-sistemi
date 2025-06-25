@@ -122,7 +122,7 @@ function YoneticiAnasayfa() {
           
           
           { text: 'Ders Programı', icon: <CalendarTodayIcon />, path: '/dersprogrami' },
-          { text: 'Devamsızlık İşlemleri', icon: <CheckCircleOutlineIcon />, path: '/devamsizlik' },
+          { text: 'Devamsızlık İşlemleri', icon: <CheckCircleOutlineIcon />, path: '/ogrencidevamsizlik' },
           { text: 'Sınav Notları', icon: <AssignmentIcon />, path: '/notlandirma' },
           { text: 'Bildirimler', icon: <MessageIcon />, path: '/bildirimler' },
           

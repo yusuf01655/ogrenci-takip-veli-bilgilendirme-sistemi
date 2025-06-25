@@ -16,6 +16,7 @@ import DevamsizlikPage from './component/DevamsizlikPage';
 import Notlandirma from './component/Notlandirma';
 import OgrenciAnasayfa from './component/OgrenciAnasayfa'; // Öğrenci için Anasayfa bileşeni
 import OgrenciBildirim from './component/OgrenciBildirim'; // Öğrenci bildirim bileşeni
+import OgrenciDevamsizlik from './component/OgrenciDevamsizlik'; // Öğrenci devamsızlık bileşeni
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userType, setUserType] = useState(null);
@@ -96,6 +97,7 @@ function App() {
             <Route path="/devamsizlik" element={<DevamsizlikPage />} />
             <Route path="/notlandirma" element={<Notlandirma />} />
             <Route path='/bildirimler' element={<OgrenciBildirim />} />
+            <Route path='/ogrencidevamsizlik' element={<OgrenciDevamsizlik />} />
           </>
         )}
       </Routes>
